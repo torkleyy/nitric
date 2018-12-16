@@ -1,0 +1,7 @@
+[package]
+name = "nitric"
+version = "0.1.0"
+authors = ["Thomas Schaller <torkleyy@gmail.com>"]
+edition = "2018"
+
+[dependencies]

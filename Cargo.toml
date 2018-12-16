@@ -1,0 +1,2 @@
+[workspace]
+members = ["crates/nitric", "crates/nitric-lock", "crates/nitric-lock-internals"]

@@ -1,0 +1,11 @@
+[package]
+name = "nitric-lock"
+version = "0.1.0"
+authors = ["Thomas Schaller <torkleyy@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+lock_api = "0.1.5"
+parking_lot = "0.7.0"
+
+nitric-lock-internals = { path = "../nitric-lock-internals", version = "0.1" }
