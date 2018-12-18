@@ -11,11 +11,11 @@ license = "MIT/Apache-2.0"
 
 [badges]
 travis-ci = { repository = "https://github.com/torkleyy/nitric"  }
-maintainance = { status = "experimental" }
+maintenance = { status = "experimental" }
 
 [dependencies]
 lock_api = "0.1.5"
 parking_lot = "0.7.0"
 
-nitric-lock-internals = { path = "../nitric-lock-internals", version = "0.0.0" }
+nitric-lock-internals = { path = "../nitric-lock-internals", version = "0.0.1" }
 
