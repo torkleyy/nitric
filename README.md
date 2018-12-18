@@ -26,7 +26,7 @@ continue and make it very hard to maintain.
     * Expose internals in an `*-internals` crate for stability by default, with the option to opt into more unstable
       facilities
 * Impose minimal friction to use `nitric`
-    * The goal is for `nitric` to be cheap and easy to use in one place of your project for solving a particular
+    * The goal is for `nitric` to be cheap and easy to use in one place of your project for solving a particular problem
     * `nitric` is meant to be compatible with other data structure / ECS / CGS libraries, e.g. [Specs], [froggy], etc. 
       instead of competing with them
 
@@ -105,7 +105,7 @@ still interested in helping out, please contact me (@torkleyy) so we can make su
 
 ## License
 
-All `nitric` projects are, except states otherwise, dual-licensed under Apache-2.0 / MIT. You're free to choose on of
+All `nitric` projects are, except stated otherwise, dual-licensed under Apache-2.0 / MIT. You're free to choose on of
 both licenses.
 
 Every contribution made to this project is assumed to be licensed according to these terms.
