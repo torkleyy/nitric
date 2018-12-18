@@ -1,7 +1,21 @@
 [package]
 name = "nitric"
-version = "0.1.0"
+version = "0.0.0"
 authors = ["Thomas Schaller <torkleyy@gmail.com>"]
 edition = "2018"
+description = "A general-purpose data-processing library."
+readme = "../../README.md"
+keywords = ["data", "processing", "ecs", "entity", "component", "data-driven"]
+repository = "https://github.com/torkleyy/nitric/tree/master/crates/nitric"
+license = "MIT/Apache-2.0"
+
+[badges]
+travis-ci = { repository = "https://github.com/torkleyy/nitric"  }
+maintainance = { status = "experimental" }
 
 [dependencies]
+nitric-lock = { path = "../nitric-lock", version = "0.0.0", optional = true }
+
+[features]
+lock = ["nitric-lock"]
+
