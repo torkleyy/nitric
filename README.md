@@ -1,5 +1,8 @@
 # `nitric`
 
+[![Build Status](https://img.shields.io/travis-ci/torkleyy/nitric.svg?style=flat-square)](https://travis-ci.org/torkleyy/nitric)
+[![Code coverage](https://img.shields.io/coveralls/github/torkleyy/nitric.svg?style=flat-square)](https://coveralls.io/github/torkleyy/nitric?branch=master)
+
 General-purpose data processing library.
 
 > Status notes: highly experimental, unfinished, work in progress, not recommended for use
