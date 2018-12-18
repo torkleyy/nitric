@@ -79,7 +79,7 @@ not assume how the code is executed. For example:
 pub fn process_local_transforms(
     local: &Storage<LocalTransform>,
     global: &mut Storage<GlobalTransform>,
-    parents: Storage<Parent>)
+    parents: &Storage<Parent>)
 {
     // compute global transforms    
 }
