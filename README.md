@@ -17,7 +17,33 @@ and composable than Specs. In fact, Specs can be implemented as a frontend for `
 ## Motivation
 
 Specs has many problems, both big and small. The library grew big without much planning and as it is now this will
-continue and make it very hard to maintain.
+continue and make it very hard to maintain. That's what made me think about what I want to create. This is what I
+ended up with:
+
+### Vision
+
+The vision for `nitric` is to provide a set of crates that evolve as the standard way to solve data processing
+problems. There were already very interesting use cases for Specs, including using it for a compiler and performing
+larger simulations, both outside of Specs' original scope (ECS for game development). This is what I intend to make
+`nitric` suitable for. So to list a few examples of what `nitric` could be used for in the future:
+
+* game development
+* game physics
+* simulations
+* compilers
+* data validation
+* Graphical User Interfaces
+
+The question how to structure your library / application is a very common one, everywhere in programming. The
+plan for `nitric` is not to force any of them, but to provide useful and modular facilities that allow for specific
+patterns (e.g. [Entity Component System] (1)), and to provide "recipes", similar to the [Rust cookbook] that show how
+common tasks can be solved. Nice side effects of that are that we can work on one implementation, that is efficient
+and can allow for neat extra functionality (debugging facilities, profiling, easy multi-threading, etc.).
+
+(1) for ECS, also see [this great presentation by Catherine West](https://kyren.github.io/rustconf_2018_slides/index.html)
+
+[Entity Component System]: https://en.wikipedia.org/wiki/Entity%E2%80%93component%E2%80%93system
+[Rust cookbook]: https://rust-lang-nursery.github.io/rust-cookbook/
 
 ### Philosophy
 
@@ -74,20 +100,6 @@ I also plan to include support for multiple values of the same type by allowing 
 This will be a re-worked version of `shred`'s `Dispatcher`, allowing to parallelize data processing (execution of
 systems). A "system" will simply be a `FnMut(T) -> R`, which means it's up to the user how the data is fetched
 (`nitric` will provide solutions for this, but it doesn't force you to use any of them).
-
-## Vision
-
-The vision for `nitric` is to provide a set of crates that evolve as the standard way to solve data processing
-problems. There were already very interesting use cases for Specs, including using it for a compiler and performing
-larger simulations, both outside of Specs' original scope (ECS for game development). This is what I intend to make
-`nitric` suitable for. So to list a few examples of what `nitric` could be used for in the future:
-
-* game development
-* game physics
-* simulations
-* compilers
-* data validation
-* Graphical User Interfaces
 
 ## Structure
 
