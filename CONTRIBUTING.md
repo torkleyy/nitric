@@ -12,6 +12,36 @@ If you experience any bugs or have feature requests, please [file an issue].
 [GitLab]: https://gitlab.com/torkleyy/nitric
 [file an issue]: https://gitlab.com/torkleyy/nitric/issues/new
 
+## Cloning the repository
+
+The following sections assume you have cloned the repository as follows:
+
+```sh
+git clone https://gitlab.com/torkleyy/nitric
+```
+
+(if you're using SSH, you need to use `git@gitlab.com:torkleyy/nitric`)
+
+Git by default sets the remote branch you cloned from to `origin`. That's what
+is usually used for the fork, so let's change that:
+
+```sh
+git remote rename origin upstream
+git remote add origin https://gitlab.com/my_user_name/nitric
+```
+
+(if you're using SSH, you need to use `git@gitlab.com:my_user_name/nitric`)
+
+## Starting a new branch
+
+I've learnt that this is not common knowledge, so please note, you do not need
+to update your (remote) fork. You can simply checkout a new branch `foo` like
+this:
+
+```sh
+git fetch upstream && git checkout -b foo upstream/master
+```
+
 ## Dealing with upstream changes
 
 Please use rebase over merge, since the latter is bad for the commit history.

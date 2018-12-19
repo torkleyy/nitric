@@ -1,5 +1,7 @@
 # Requirements
 
+> Note: this document is still rather incomplete.
+
 The following is a list of requirements that have been collected, and with
 which crates for `nitric` are built. Feel free to request more by creating a
 Pull Request! Be aware that this list does not explicitly mention features
@@ -37,8 +39,6 @@ specific to `nitric-graph`.
     * detect cycles
     * allow fallback behavior (error handling)
 
-
-
 ## Components
 
 Requirements for components, which is the term for a data-point in an ECS.
@@ -49,5 +49,31 @@ Requirements for components, which is the term for a data-point in an ECS.
 
 ## World
 
+The `World` in Specs was simply a mapping from `TypeId` -> resource. A resource
+could be anything, from a simple `i32` to a component storage.
 
+One big problem was that most parts of Specs, and projects using Specs, assumed
+one global `World` (and with that also global resources). That unfortunately is
+bad for re-usability and doesn't work anymore if the constraints aren't as
+simple as "let's, in the beginning, put all data in the world and be done".
 
+Thus, the uppermost requirement here is that `nitric` does not assume how
+resources are stored. In the end, you just need to have references to them.
+
+That means you will be able to store all resources in a struct (if you want
+that):
+
+```rust
+pub struct MyWorld {
+    foos: Storage<Foo>,
+    bars: Storage<Bar>,
+
+    /// Let's wrap this one in a lock (cause we can)
+    baz: Mutex<Baz>,
+    /// Does not need a lock, since it's atomic
+    allocator: Allocator,
+}
+```
+
+However, there are use cases for more dynamic solutions (think of scripting),
+so a dynamic solution will be provided, too. We just don't assume it's used.
