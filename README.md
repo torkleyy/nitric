@@ -37,7 +37,7 @@ larger simulations, both outside of Specs' original scope (ECS for game developm
 * data validation
 * Graphical User Interfaces
 
-The question how to structure your library / application is a very common one, everywhere in programming. The
+The question of how to structure your library/application is a very common one, everywhere in programming. The
 plan for `nitric` is not to force any of them, but to provide useful and modular facilities that allow for specific
 patterns (e.g. [Entity Component System] (1)), and to provide "recipes", similar to the [Rust cookbook] that show how
 common tasks can be solved. Nice side effects of that are that we can work on one implementation, that is efficient
@@ -58,7 +58,7 @@ and can allow for neat extra functionality (debugging facilities, profiling, eas
     * APIs should either be designed to not produce any error cases or return a `Result` with only the possible error
       conditions
     * Do not assume how the API is being used (-> composability)
-    * Expose internals in an `*-internals` crate for stability by default, with the option to opt into more unstable
+    * Expose internals in a `*-internals` crate for stability by default, with the option to opt into more unstable
       facilities
 * Impose minimal friction to use `nitric`
     * The goal is for `nitric` to be cheap and easy to use in one place of your project for solving a particular problem
@@ -91,7 +91,7 @@ pub fn process_local_transforms(
 ```
 
 If those component storages come from a dynamically typed, string mapped `HashMap`, fine. If they are stored in a 
-`struct` - works, too. How systems are ran also doesn't matter.
+`struct` - works, too. How systems are run also doesn't matter.
 
 Now, there surely are other things Specs users would miss, so the next crate will be...
 
@@ -125,7 +125,7 @@ Current crates:
 For the immediate future, this has no effect on Specs. It will not be deprecated. The biggest change for now is that
 I won't spend much time on it (just merge PRs and fix critical bugs).
 
-As for when nitric is in a usable state, that has yet to be seen. In any case it should be possible to make Specs a
+As for when nitric is in a usable state, that has yet to be seen. In any case, it should be possible to make Specs a
 thin wrapper over `nitric` crates (if that's necessary). All that depends on how well `nitric` will be adopted.
 
 ### What does this mean for Amethyst?
@@ -139,7 +139,7 @@ the future will be decided by all members, through the usual RFC process.
 
 `nitric` can only exist with lively contributions and every help is very much appreciated!
 
-Please note that in its current state however, the project might not be very friendly for contributions. If you're
+Please note that in its current state, however, the project might not be very friendly for contributions. If you're
 still interested in helping out, please contact me (@torkleyy) so we can make sure there's no duplicated effort.
 
 ## License
