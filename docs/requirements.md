@@ -39,6 +39,13 @@ specific to `nitric-graph`.
     * detect cycles
     * allow fallback behavior (error handling)
 
+### Asynchronous systems
+
+* Allow systems that do not have to complete until the end of the frame
+* Do not rely on a particular library (e.g. `futures`), but provide a simple
+  interface that can be used by any async framework; an interface for `futures`
+  can be provided separately
+
 ## Components
 
 Requirements for components, which is the term for a data-point in an ECS.
