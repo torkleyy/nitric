@@ -43,8 +43,9 @@ patterns (e.g. [Entity Component System] (1)), and to provide "recipes", similar
 common tasks can be solved. Nice side effects of that are that we can work on one implementation, that is efficient
 and can allow for neat extra functionality (debugging facilities, profiling, easy multi-threading, etc.).
 
-(1) for ECS, also see [this great presentation by Catherine West](https://kyren.github.io/rustconf_2018_slides/index.html)
+(1) for ECS, also see [this great presentation by Catherine West][gpcw]
 
+[gpcw]: https://kyren.github.io/rustconf_2018_slides/index.html
 [Entity Component System]: https://en.wikipedia.org/wiki/Entity%E2%80%93component%E2%80%93system
 [Rust cookbook]: https://rust-lang-nursery.github.io/rust-cookbook/
 
@@ -61,7 +62,7 @@ and can allow for neat extra functionality (debugging facilities, profiling, eas
       facilities
 * Impose minimal friction to use `nitric`
     * The goal is for `nitric` to be cheap and easy to use in one place of your project for solving a particular problem
-    * `nitric` is meant to be compatible with other data structure / ECS / CGS libraries, e.g. [Specs], [froggy], etc. 
+    * `nitric` is meant to be compatible with other data structure / ECS / CGS libraries, e.g. [Specs], [froggy], etc.
       instead of competing with them
 
 [froggy]: https://github.com/kvark/froggy
