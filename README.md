@@ -14,6 +14,9 @@ and composable than Specs. In fact, Specs can be implemented as a frontend for `
 
 [Specs]: https://github.com/slide-rs/specs
 
+* [nitric on GitLab](https://gitlab.com/torkleyy/nitric)
+* [nitric on GitHub (mirror)](https://github.com/torkleyy/nitric)
+
 ## Motivation
 
 Specs has many problems, both big and small. The library grew big without much planning and as it is now this will
