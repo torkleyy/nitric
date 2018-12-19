@@ -9,18 +9,18 @@ please send me a Merge Reqest!
 
 If you experience any bugs or have feature requests, please [file an issue].
 
-[GitLab]: https://gitlab.com/torkleyy/nitric
-[file an issue]: https://gitlab.com/torkleyy/nitric/issues/new
+[GitLab]: https://gitlab.com/nitric/nitric
+[file an issue]: https://gitlab.com/nitric/nitric/issues/new
 
 ## Cloning the repository
 
 The following sections assume you have cloned the repository as follows:
 
 ```sh
-git clone https://gitlab.com/torkleyy/nitric
+git clone https://gitlab.com/nitric/nitric
 ```
 
-(if you're using SSH, you need to use `git@gitlab.com:torkleyy/nitric`)
+(if you're using SSH, you need to use `git@gitlab.com:nitric/nitric`)
 
 Git by default sets the remote branch you cloned from to `origin`. That's what
 is usually used for the fork, so let's change that:

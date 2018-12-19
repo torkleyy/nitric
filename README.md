@@ -14,7 +14,7 @@ and composable than Specs. In fact, Specs can be implemented as a frontend for `
 
 [Specs]: https://github.com/slide-rs/specs
 
-* [nitric on GitLab](https://gitlab.com/torkleyy/nitric)
+* [nitric on GitLab](https://gitlab.com/nitric/nitric)
 * [nitric on GitHub (mirror)](https://github.com/torkleyy/nitric)
 
 ## Motivation
