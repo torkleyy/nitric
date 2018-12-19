@@ -113,6 +113,23 @@ Current crates:
 
 [`nitric-lock`]: crates/nitric-lock/
 
+## FAQ
+
+### What does this mean for Specs?
+
+For the immediate future, this has no effect on Specs. It will not be deprecated. The biggest change for now is that
+I won't spend much time on it (just merge PRs and fix critical bugs).
+
+As for when nitric is in a usable state, that has yet to be seen. In any case it should be possible to make Specs a
+thin wrapper over `nitric` crates (if that's necessary). All that depends on how well `nitric` will be adopted.
+
+### What does this mean for Amethyst?
+
+[Amethyst] (a game engine that makes heavy use of Specs) will continue to use Specs. Whether it will use `nitric` in
+the future will be decided by all members, through the usual RFC process. 
+
+[Amethyst]: https://github.com/amethyst/amethyst
+
 ## Contribution
 
 `nitric` can only exist with lively contributions and every help is very much appreciated!
