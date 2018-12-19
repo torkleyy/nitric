@@ -143,3 +143,6 @@ All `nitric` projects are, except stated otherwise, dual-licensed under Apache-2
 both licenses.
 
 Every contribution made to this project is assumed to be licensed according to these terms.
+
+See [LICENSE](LICENSE), [docs/LICENSE-MIT](docs/LICENSE-MIT) and [docs/LICENSE-APACHE] for more
+information.
