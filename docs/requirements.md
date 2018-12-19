@@ -47,6 +47,13 @@ Requirements for components, which is the term for a data-point in an ECS.
     * mutually exclusive components
 * Provide a solution to track component modifications
 
+## Entities
+
+Entities in Specs were IDs (plus a generation to avoid usage of deleted
+entities) that were mapped to components by the component storages.
+
+* Allow arbitrary ID allocation
+
 ## World
 
 The `World` in Specs was simply a mapping from `TypeId` -> resource. A resource
