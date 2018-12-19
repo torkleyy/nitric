@@ -62,10 +62,11 @@ and can allow for neat extra functionality (debugging facilities, profiling, eas
       facilities
 * Impose minimal friction to use `nitric`
     * The goal is for `nitric` to be cheap and easy to use in one place of your project for solving a particular problem
-    * `nitric` is meant to be compatible with other data structure / ECS / CGS libraries, e.g. [Specs], [froggy], etc.
+    * `nitric` is meant to be compatible with other data structure / ECS / [CGS] libraries, e.g. [Specs], [froggy], etc.
       instead of competing with them
 
 [froggy]: https://github.com/kvark/froggy
+[CGS]: https://github.com/kvark/froggy/wiki/Component-Graph-System
 
 ### Using `nitric` as ECS
 
