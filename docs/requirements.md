@@ -53,6 +53,7 @@ Requirements for components, which is the term for a data-point in an ECS.
 * Provide a solution that allows component dependencies
     * mutually exclusive components
 * Provide a solution to track component modifications
+* Easy way of returning a reference to a component in a library
 
 ## Entities
 
