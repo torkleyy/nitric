@@ -1,4 +1,3 @@
-
 #[cfg(feature = "lock")]
-pub extern crate nitric_lock;
+#[doc(inline)] pub use nitric_lock as lock;
 
