@@ -1,7 +1,7 @@
 # `nitric`
 
 [![Build Status](https://img.shields.io/travis-ci/torkleyy/nitric.svg?style=flat-square)](https://travis-ci.org/torkleyy/nitric)
-[![Code coverage](https://img.shields.io/coveralls/github/torkleyy/nitric.svg?style=flat-square)](https://coveralls.io/github/torkleyy/nitric?branch=master)
+[![Code coverage](https://img.shields.io/codecov/c/gitlab/nitric/nitric/master.svg?style=flat-square)](https://codecov.io/gl/nitric/nitric/branch/master)
 [![Crates.io](https://img.shields.io/crates/v/nitric.svg?style=flat-square)](https://crates.io/crates/nitric)
 [![API Docs](https://img.shields.io/badge/API-on%20docs.rs-blue.svg?style=flat-square)](https://docs.rs/nitric)
 
