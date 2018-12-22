@@ -46,11 +46,11 @@ apidoc:
   stage: doc
   script:
   - cargo doc --all
-  - mkdir -p public/api
-  - cp -R target/doc/* public/api
+  - mkdir -p public
+  - cp -R target/doc/* public/
   artifacts:
     paths:
-    - public/api
+    - public
 
 deploy:codecov:
   stage: deploy
