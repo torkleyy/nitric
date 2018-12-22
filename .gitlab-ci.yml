@@ -17,8 +17,32 @@ image: "rust:latest"
 #- apt-get update -yqq
 #- apt-get install -yqq --no-install-recommends build-essential
 
+stages:
+  - test
+  - push
+
 # Use cargo to test the project
 test:cargo:
+  stage: test
   script:
   - rustc --version && cargo --version      # Print version info for debugging
   - cargo test --all --verbose
+
+test:kcov:
+  stage: test
+  image: docker:latest
+  services: 
+  - docker:dind
+  script:
+  - docker --version
+  - ./scripts/kcov.sh
+  artifacts:
+    paths:
+    - cov/
+    expire_in: 1 hour
+
+push:codecov:
+  stage: push
+  script:
+  - ls
+  - curl -v -s https://codecov.io/bash | bash
