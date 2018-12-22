@@ -42,7 +42,7 @@ test:kcov:
     - cov/
     expire_in: 1 hour
 
-apidoc:
+pages:
   stage: doc
   script:
   - cargo doc --all
