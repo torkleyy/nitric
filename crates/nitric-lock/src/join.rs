@@ -33,8 +33,8 @@ where
 
 #[cfg(test)]
 mod tests {
-    use crate::*;
     use super::*;
+    use crate::*;
 
     #[test]
     fn test_lock2() {
@@ -43,6 +43,22 @@ mod tests {
 
         let mutex_a = group.mutex(42);
         let mutex_b = group.mutex(35);
+
+        let (a, mut b) = lock2(&mut token, mutex_a.read(), mutex_b.write());
+
+        assert_eq!(*a, 42);
+        assert_eq!(*b, 35);
+
+        *b = 15;
+    }
+
+    #[test]
+    fn test_lock2_rev() {
+        let mut group = LockGroup::new();
+        let mut token = group.token();
+
+        let mutex_b = group.mutex(35);
+        let mutex_a = group.mutex(42);
 
         let (a, mut b) = lock2(&mut token, mutex_a.read(), mutex_b.write());
 

@@ -28,9 +28,7 @@ impl LockGroup {
     }
 
     pub fn token(&mut self) -> LockToken {
-        LockToken {
-            _opaque: (),
-        }
+        LockToken { _opaque: () }
     }
 }
 

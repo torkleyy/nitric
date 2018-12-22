@@ -17,4 +17,4 @@ maintenance = { status = "experimental" }
 lock_api = "0.1.5"
 parking_lot = "0.7.0"
 
-nitric-lock-internals = { path = "../nitric-lock-internals", version = "0.0.1" }
+#nitric-lock-internals = { path = "../nitric-lock-internals", version = "0.0.1" }

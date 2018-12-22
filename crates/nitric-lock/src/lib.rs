@@ -5,17 +5,8 @@
 
 pub use self::group::{LockGroup, LockToken};
 pub use self::join::lock2;
-pub use self::lock::{Lock, Ref, Mut, ReadLock, WriteLock};
+pub use self::lock::{Lock, LockInfo, Mut, RawLockGuard, ReadLock, Ref, WriteLock};
 pub use self::mutex::{Mutex, MutexGuard};
-
-pub(crate) use nitric_lock_internals as internal;
-
-use std::cell::UnsafeCell;
-use std::marker::PhantomData;
-use std::ops::{Deref, DerefMut};
-
-use lock_api::RawMutex as Unused0;
-use parking_lot::RawMutex;
 
 mod group;
 mod join;

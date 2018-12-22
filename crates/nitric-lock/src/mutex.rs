@@ -3,7 +3,7 @@ use std::{cell::UnsafeCell, marker::PhantomData, ops::Deref, ops::DerefMut};
 use lock_api::RawMutex as Unused0;
 use parking_lot::RawMutex;
 
-use crate::internal;
+use crate::{LockInfo, RawLockGuard, ReadLock, WriteLock};
 
 pub fn new_mutex<T>(data: T, id: usize) -> Mutex<T> {
     Mutex {
@@ -53,38 +53,38 @@ impl<T> Mutex<T> {
     }
 }
 
-impl<'a, T> internal::ReadLock<'a> for &'a Mutex<T>
+impl<'a, T> ReadLock<'a> for &'a Mutex<T>
 where
     T: 'a,
 {
     type Output = MutexGuard<'a, T>;
 
-    unsafe fn lock_info(&self) -> internal::LockInfo<'_> {
-        internal::LockInfo {
+    unsafe fn lock_info(&self) -> LockInfo<'_> {
+        LockInfo {
             id: self.lock_id(),
-            guard: internal::RawLockGuard::RawMutex(self.raw()),
+            guard: RawLockGuard::RawMutex(self.raw()),
         }
     }
 
-    unsafe fn lock_unchecked(self) -> <Self as internal::ReadLock<'a>>::Output {
+    unsafe fn lock_unchecked(self) -> <Self as ReadLock<'a>>::Output {
         self.acquire_guard()
     }
 }
 
-impl<'a, T> internal::WriteLock<'a> for &'a Mutex<T>
+impl<'a, T> WriteLock<'a> for &'a Mutex<T>
 where
     T: 'a,
 {
     type Output = MutexGuard<'a, T>;
 
-    unsafe fn lock_info(&self) -> internal::LockInfo<'_> {
-        internal::LockInfo {
+    unsafe fn lock_info(&self) -> LockInfo<'_> {
+        LockInfo {
             id: self.lock_id(),
-            guard: internal::RawLockGuard::RawMutex(self.raw()),
+            guard: RawLockGuard::RawMutex(self.raw()),
         }
     }
 
-    unsafe fn lock_unchecked(self) -> <Self as internal::WriteLock<'a>>::Output {
+    unsafe fn lock_unchecked(self) -> <Self as WriteLock<'a>>::Output {
         self.acquire_guard()
     }
 }

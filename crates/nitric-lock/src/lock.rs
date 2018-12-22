@@ -1,18 +1,69 @@
-use crate::internal;
+use lock_api::RawMutex as Unused0;
+use parking_lot::RawMutex;
 
-pub trait Lock<'a>: internal::Lock<'a> {}
+pub trait Lock<'a> {
+    type Output;
 
-impl<'a, T> Lock<'a> for T where T: internal::Lock<'a> {}
+    unsafe fn lock_info(&self) -> LockInfo<'_>;
+    unsafe fn lock_unchecked(self) -> Self::Output;
+}
+
+pub struct LockInfo<'a> {
+    pub id: usize,
+    pub guard: RawLockGuard<'a>,
+}
+
+pub enum Never {}
+
+pub enum RawLockGuard<'a> {
+    RawMutex(&'a RawMutex),
+
+    #[doc(hidden)]
+    __NonExhaustive(Never),
+}
+
+impl<'a> RawLockGuard<'a> {
+    pub fn lock(&self) {
+        match *self {
+            RawLockGuard::RawMutex(ref raw) => raw.lock(),
+            RawLockGuard::__NonExhaustive(ref n) => match *n {},
+        }
+    }
+
+    pub fn try_lock(&self) -> bool {
+        match *self {
+            RawLockGuard::RawMutex(ref raw) => raw.try_lock(),
+            RawLockGuard::__NonExhaustive(ref n) => match *n {},
+        }
+    }
+}
+
+pub struct Mut<T>(T);
+
+impl<'a, T> Lock<'a> for Mut<T>
+where
+    T: WriteLock<'a>,
+{
+    type Output = <T as WriteLock<'a>>::Output;
+
+    unsafe fn lock_info(&self) -> LockInfo<'_> {
+        <T as WriteLock<'a>>::lock_info(&self.0)
+    }
+
+    unsafe fn lock_unchecked(self) -> Self::Output {
+        <T as WriteLock<'a>>::lock_unchecked(self.0)
+    }
+}
 
 pub struct Ref<T>(T);
 
-impl<'a, T> internal::Lock<'a> for Ref<T>
+impl<'a, T> Lock<'a> for Ref<T>
 where
     T: ReadLock<'a>,
 {
     type Output = T::Output;
 
-    unsafe fn lock_info(&self) -> internal::LockInfo<'_> {
+    unsafe fn lock_info(&self) -> LockInfo<'_> {
         self.0.lock_info()
     }
 
@@ -21,41 +72,30 @@ where
     }
 }
 
-pub struct Mut<T>(T);
+pub trait ReadLock<'a> {
+    type Output;
 
-impl<'a, T> internal::Lock<'a> for Mut<T>
-where
-    T: WriteLock<'a>,
-{
-    type Output = <T as internal::WriteLock<'a>>::Output;
-
-    unsafe fn lock_info(&self) -> internal::LockInfo<'_> {
-        <T as internal::WriteLock<'a>>::lock_info(&self.0)
-    }
-
-    unsafe fn lock_unchecked(self) -> Self::Output {
-        <T as internal::WriteLock<'a>>::lock_unchecked(self.0)
-    }
-}
-
-pub trait ReadLock<'a>: internal::ReadLock<'a> {
     fn read(self) -> Ref<Self>
     where
-        Self: Sized
+        Self: Sized,
     {
         Ref(self)
     }
+
+    unsafe fn lock_info(&self) -> LockInfo<'_>;
+    unsafe fn lock_unchecked(self) -> Self::Output;
 }
 
-impl<'a, T> ReadLock<'a> for T where T: internal::ReadLock<'a> {}
+pub trait WriteLock<'a> {
+    type Output;
 
-pub trait WriteLock<'a>: internal::WriteLock<'a> {
     fn write(self) -> Mut<Self>
     where
         Self: Sized,
     {
         Mut(self)
     }
-}
 
-impl<'a, T> WriteLock<'a> for T where T: internal::WriteLock<'a> {}
+    unsafe fn lock_info(&self) -> LockInfo<'_>;
+    unsafe fn lock_unchecked(self) -> <Self as WriteLock<'a>>::Output;
+}
