@@ -19,7 +19,8 @@ image: "rust:latest"
 
 stages:
   - test
-  - push
+  - doc
+  - deploy
 
 # Use cargo to test the project
 test:cargo:
@@ -41,8 +42,18 @@ test:kcov:
     - cov/
     expire_in: 1 hour
 
-push:codecov:
-  stage: push
+apidoc:
+  stage: doc
+  script:
+  - cargo doc --all
+  - mkdir -p public/api
+  - cp -R target/doc/* public/api
+  artifacts:
+    paths:
+    - public/api
+
+deploy:codecov:
+  stage: deploy
   script:
   - ls
   - curl -v -s https://codecov.io/bash | bash
