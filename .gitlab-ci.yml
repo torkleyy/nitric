@@ -9,7 +9,7 @@ image: "rust:latest"
 .code_change_: &code_change
   only:
     changes:
-    - crates
+    - crates/**
     - Cargo.toml
 
 stages:
@@ -49,6 +49,9 @@ pages:
     paths:
     - public
   only:
+    changes:
+    - crates/**
+    - Cargo.toml
     refs:
     - master
 
@@ -66,5 +69,8 @@ crates.io:
   script:
   - cargo-publish-all --token $CRATES_IO_TOKEN --yes
   only:
+    changes:
+    - crates/**
+    - Cargo.toml
     refs:
     - master
