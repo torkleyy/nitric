@@ -1,8 +1,6 @@
 //! Joined locking
 //!
 
-use std::mem::swap;
-
 use crate::{Lock, LockToken};
 
 pub fn lock2<'token, A, B>(_: &'token mut LockToken, a: A, b: B) -> (A::Output, B::Output)

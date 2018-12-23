@@ -4,6 +4,7 @@
 //!
 
 pub use self::group::{LockGroup, LockToken};
+pub use self::join::lock2;
 pub use self::lock::{Lock, Ref, Mut, ReadLock, WriteLock};
 pub use self::mutex::{Mutex, MutexGuard};
 
