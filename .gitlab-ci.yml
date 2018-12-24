@@ -1,16 +1,7 @@
 image: "rust:latest"
 
-.code_change:
+.master_only:
   only:
-    changes:
-    - crates/**
-    - Cargo.toml
-
-.master_code_change:
-  only:
-    changes:
-    - crates/**
-    - Cargo.toml
     refs:
     - master
 
@@ -20,14 +11,12 @@ stages:
   - deploy
 
 test:cargo:
-  extends: .code_change
   stage: test
   script:
   - rustc --version && cargo --version
   - cargo test --all --verbose
 
 test:kcov:
-  extends: .code_change
   stage: test
   image: docker:latest
   services: 
@@ -41,7 +30,7 @@ test:kcov:
     expire_in: 1 hour
 
 pages:
-  extends: .master_code_change
+  extends: .master_only
   stage: doc
   script:
   - cargo doc --all
@@ -52,14 +41,13 @@ pages:
     - public
 
 deploy:codecov:
-  extends: .code_change
   stage: deploy
   script:
   - ls
   - curl -v -s https://codecov.io/bash | bash
 
 crates.io:
-  extends: .master_code_change
+  extends: .master_only
   image: registry.gitlab.com/torkleyy/cargo-publish-all:latest
   stage: deploy
   script:
