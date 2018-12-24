@@ -114,8 +114,10 @@ you enable the flag.
 
 Current crates:
 
+* [`nitric-component`] - Component storages with custom id spaces
 * [`nitric-lock`] - Locks with deadlock prevention & lock ordering
 
+[`nitric-component`]: crates/nitric-component/
 [`nitric-lock`]: crates/nitric-lock/
 
 ## FAQ

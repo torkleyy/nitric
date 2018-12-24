@@ -1,2 +1,7 @@
 [workspace]
-members = ["crates/nitric", "crates/nitric-lock", "crates/nitric-lock-internals"]
+members = [
+    "crates/nitric",
+    "crates/nitric-component",
+    "crates/nitric-lock",
+    "crates/nitric-lock-internals",
+]
