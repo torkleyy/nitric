@@ -4,7 +4,10 @@
 //! split up into traits.
 //!
 
-use crate::id::Id;
+use crate::{
+    error::{InvalidIdError, OomError},
+    id::Id,
+};
 
 /// Generic allocator for IDs of type `Self::Id`.
 pub trait Allocator {
@@ -14,6 +17,10 @@ pub trait Allocator {
     /// Checks if `id` is a valid ID.
     ///
     /// This can return `false` for example if the ID has been deleted.
+    ///
+    /// # Panics
+    ///
+    /// Panics in debug mode if `id` was allocated by a different allocator.
     fn is_valid(&self, id: &Self::Id) -> bool;
 }
 
@@ -24,7 +31,7 @@ pub trait Create: Allocator {
     ///
     /// In case your allocator supports atomic ID creation, you should implement this for `&Self`,
     /// too.
-    fn create(&mut self) -> Self::Id;
+    fn create(&mut self) -> Result<Self::Id, OomError>;
 }
 
 /// Trait implemented by allocators that can delete IDs, atomically and without additional
@@ -38,5 +45,5 @@ pub trait Delete: Allocator {
     /// # Panics
     ///
     /// Panics in debug mode if `id` was allocated by a different allocator.
-    fn delete(&mut self, id: &Self::Id);
+    fn delete(&mut self, id: &Self::Id) -> Result<(), InvalidIdError<Self::Id>>;
 }

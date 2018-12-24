@@ -29,10 +29,14 @@
 //! * `impls`
 //!
 
+#[macro_use]
+extern crate err_derive;
+
 use std::fmt::Debug;
 
 pub mod allocator;
 pub mod id;
 pub mod storage;
 
+pub mod error;
 pub mod impls;
