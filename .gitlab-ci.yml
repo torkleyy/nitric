@@ -1,16 +1,18 @@
 image: "rust:latest"
 
-# Optional: Install a C compiler, cmake and git into the container.
-# You will often need this when you (or any of your dependencies) depends on C code.
-#before_script:
-#- apt-get update -yqq
-#- apt-get install -yqq --no-install-recommends build-essential
-
-.code_change_: &code_change
+.code_change:
   only:
     changes:
     - crates/**
     - Cargo.toml
+
+.master_code_change:
+  only:
+    changes:
+    - crates/**
+    - Cargo.toml
+    refs:
+    - master
 
 stages:
   - test
@@ -18,14 +20,14 @@ stages:
   - deploy
 
 test:cargo:
-  <<: *code_change
+  extends: .code_change
   stage: test
   script:
   - rustc --version && cargo --version
   - cargo test --all --verbose
 
 test:kcov:
-  <<: *code_change
+  extends: .code_change
   stage: test
   image: docker:latest
   services: 
@@ -39,7 +41,7 @@ test:kcov:
     expire_in: 1 hour
 
 pages:
-  <<: *code_change
+  extends: .master_code_change
   stage: doc
   script:
   - cargo doc --all
@@ -48,29 +50,17 @@ pages:
   artifacts:
     paths:
     - public
-  only:
-    changes:
-    - crates/**
-    - Cargo.toml
-    refs:
-    - master
 
 deploy:codecov:
-  <<: *code_change
+  extends: .code_change
   stage: deploy
   script:
   - ls
   - curl -v -s https://codecov.io/bash | bash
 
 crates.io:
-  <<: *code_change
+  extends: .master_code_change
   image: registry.gitlab.com/torkleyy/cargo-publish-all:latest
   stage: deploy
   script:
   - cargo-publish-all --token $CRATES_IO_TOKEN --yes
-  only:
-    changes:
-    - crates/**
-    - Cargo.toml
-    refs:
-    - master
