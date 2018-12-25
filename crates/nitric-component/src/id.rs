@@ -1,18 +1,23 @@
+/// Provides a generic ID interface.
+///
+/// IDs are used as keys for component storages. They can be continuous or sparse, while only
+/// the latter one allows to delete arbitrary ids after creation.
+
 use std::fmt::Debug;
+use std::hash::Hash;
 
 use crate::allocator::Allocator;
 
 // TODO: this is not compatible with all use cases / too complicated for some
 // TODO: consider removing trait
 
-/// Generic ID interface.
-///
-/// IDs are used as keys for component storages. They can be continuous or sparse, while only
-/// the latter one allows to delete ids after creation.
-pub trait Id: Clone + Debug + Sized {
+/// Top-level trait that all IDs must implement.
+pub trait Id: Clone + Debug + Hash + Eq + Sized {
     /// The allocator which manages IDs of this type.
     type Allocator: Allocator<Id = Self> + ?Sized;
+}
 
+pub trait Sparse: Id {
     /// This is an associated type that will be used by the storage. A storage which maps this ID
     /// type stores a field of type `Self::Mask`, which will be used to check if a component exists
     /// for a particular ID.
