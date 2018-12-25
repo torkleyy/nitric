@@ -1,3 +1,3 @@
-use crate::id::Id;
+//! Provides a generic interface for storages.
 
 

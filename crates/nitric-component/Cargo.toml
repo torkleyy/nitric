@@ -14,4 +14,5 @@ travis-ci = { repository = "https://github.com/torkleyy/nitric"  }
 maintenance = { status = "experimental" }
 
 [dependencies]
+derivative = "1"
 err-derive = "0.1"

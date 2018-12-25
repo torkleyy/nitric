@@ -1,4 +1,4 @@
-use crate::id::Id;
+use crate::id::SparseLinear;
 
 /// A component storage implementation, providing a mapping from IDs to components using two `Vec`s.
 ///
@@ -15,16 +15,16 @@ use crate::id::Id;
 /// * `C`: The component, which is the value.
 pub struct DvStorage<ID, C>
 where
-    ID: Id,
+    ID: SparseLinear,
 {
     data: Vec<C>,
     indices: Vec<usize>,
-    mask: ID::Mask,
+    mask: ID::BitSet,
 }
 
 impl<ID, C> DvStorage<ID, C>
 where
-    ID: Id,
+    ID: SparseLinear,
 {
     /// Creates a new, empty component storage.
     pub fn new() -> Self {
@@ -34,13 +34,13 @@ where
 
 impl<ID, C> Default for DvStorage<ID, C>
 where
-    ID: Id,
+    ID: SparseLinear,
 {
     fn default() -> Self {
         DvStorage {
             data: vec![],
             indices: vec![],
-            mask: ID::empty_mask(),
+            mask: ID::empty_bit_set(),
         }
     }
 }
