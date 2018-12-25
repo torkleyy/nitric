@@ -1,12 +1,8 @@
-use std::marker::PhantomData;
+use std::{borrow::Borrow, marker::PhantomData};
 
 use derivative::Derivative;
 
-use crate::allocator::PhantomAllocator;
-use crate::id::Id;
-use crate::id::ValidId;
-use crate::id::AsUsize;
-use crate::error::InvalidIdError;
+use crate::{allocator::PhantomAllocator, error::InvalidIdError, id::AsUsize, id::Id, id::ValidId};
 
 /// Represents an ID that is guaranteed to be valid.
 ///
@@ -42,7 +38,9 @@ where
             _allocator: PhantomData,
         }
     }
+}
 
+impl<'allocator, ID> CheckedId<'allocator, ID> {
     /// Moves out the inner ID.
     pub fn into_inner(self) -> ID {
         self.id
@@ -54,11 +52,17 @@ where
 ///
 /// `try_as_usize` always returns `Ok`.
 impl<'allocator, ID> AsUsize for CheckedId<'allocator, ID>
-    where
-        ID: Id + 'allocator,
+where
+    ID: Id + 'allocator,
 {
     fn try_as_usize(&self, _: &<Self as Id>::Allocator) -> Result<usize, InvalidIdError<Self>> {
         Ok(self.as_usize())
+    }
+}
+
+impl<'allocator, ID> Borrow<ID> for CheckedId<'allocator, ID> {
+    fn borrow(&self) -> &ID {
+        &self.id
     }
 }
 
@@ -69,7 +73,13 @@ where
     type Allocator = PhantomAllocator<'allocator, Self, ID>;
 }
 
-unsafe impl<'allocator, ID> ValidId for CheckedId<'allocator, ID>
+impl<'allocator, ID> Into<ID> for CheckedId<'allocator, ID> {
+    fn into(self) -> ID {
+        self.into_inner()
+    }
+}
+
+unsafe impl<'allocator, ID> ValidId<ID> for CheckedId<'allocator, ID>
 where
     ID: Id + 'allocator,
 {

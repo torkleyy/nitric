@@ -102,9 +102,9 @@ pub trait Delete: Allocator {
     /// # Panics
     ///
     /// Panics in debug mode if `id` was allocated by a different allocator.
-    fn delete(&mut self, id: &Self::Id)
+    fn delete<V>(&mut self, id: &V)
     where
-        Self::Id: ValidId;
+        V: ValidId<Self::Id>;
 
     /// Deletes a previously created ID, failing if the ID is invalid.
     /// See `Delete::delete`.

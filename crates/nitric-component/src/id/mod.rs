@@ -5,10 +5,9 @@
 
 pub use self::checked::CheckedId;
 
-use std::{fmt::Debug, hash::Hash};
+use std::{borrow::Borrow, fmt::Debug, hash::Hash};
 
-use crate::allocator::Allocator;
-use crate::error::InvalidIdError;
+use crate::{allocator::Allocator, bit_set::BitSet, error::InvalidIdError};
 
 mod checked;
 
@@ -27,7 +26,8 @@ pub trait AsUsize: Id {
     ) -> Result<CheckedId<'_, Self>, InvalidIdError<Self>> {
         // Unsafety: this is safe because the allocator is guaranteed to keep IDs valid for as long
         // as it is borrowed immutably. We ensure it's valid
-        self.try_as_usize(allocator).map(|u| unsafe { CheckedId::new_from_fields(self, u, allocator) })
+        self.try_as_usize(allocator)
+            .map(|u| unsafe { CheckedId::new_from_fields(self, u, allocator) })
     }
 
     /// Returns the `usize` representation of this ID, failing if the ID is invalid.
@@ -69,21 +69,18 @@ pub trait SparseLinear: AsUsize + Id {
     /// This is the bit set type that will be used by the storage. A storage which maps this ID
     /// type stores a field of type `Self::BitSet`, which will be used to check if a component
     /// exists for a particular ID.
-    ///
-    /// # Examples
-    ///
-    /// * length (`usize`) if components are inserted continuously
-    /// * a bit set for sparsely stored components
-    type BitSet: Sized;
-
-    /// Creates an empty bit set (every bit set to zero).
-    fn empty_bit_set() -> Self::BitSet;
+    type BitSet: BitSet;
 }
 
 /// Represents an ID that is guaranteed to be valid.
 ///
 /// If you have an ID that may be valid or not, consider using `.checked()` to retrieve a `Checked`
 /// instance which implements `ValidId`.
+///
+/// # Generics
+///
+/// * `O`: "Original" ID; this might be `Self` if the ID is always valid, or a wrapper ID
+///   (like `CheckedId`)
 ///
 /// # Contract
 ///
@@ -93,7 +90,7 @@ pub trait SparseLinear: AsUsize + Id {
 /// # Memory safety
 ///
 /// Implementing this type without meeting the contract may produce memory safety bugs.
-pub unsafe trait ValidId: Id {
+pub unsafe trait ValidId<O: Id>: Borrow<O> + Id + Into<O> {
     /// Returns the `usize` representation of this ID.
     ///
     /// This operation cannot fail and is only available for IDs that have this property ensured

@@ -7,12 +7,13 @@
 //!
 //! ### Split traits
 //!
-//! Often you might expect traits like `Storage`. However, there is no such trait. This is simply
-//! because different storages have different traits, so the different properties are split into
-//! multiple traits. That means all code will only depend on the traits it actually uses.
+//! Often you might expect more methods in traits like `Storage`. However, many properties of
+//! storages, allocators and IDs are optional and not implemented for all instances. That means all
+//! code will only depend on the traits it actually uses and is therefore reusable in many
+//! situations.
 //!
-//! Traits are always grouped together in modules so you have an overview of what storages might be
-//! able to do.
+//! Traits are always grouped together in modules so you have an overview of the methods you can
+//! use.
 //!
 //! ## Structure
 //!
@@ -21,6 +22,7 @@
 //! Generic interfaces are in
 //!
 //! * `allocator`
+//! * `bit_set`
 //! * `id`
 //! * `storage`
 //!
@@ -28,11 +30,14 @@
 //!
 //! * `impls`
 //!
+//! Additionally, error types can be found in `error`.
+//!
 
 #[macro_use]
 extern crate err_derive;
 
 pub mod allocator;
+pub mod bit_set;
 pub mod id;
 pub mod storage;
 
