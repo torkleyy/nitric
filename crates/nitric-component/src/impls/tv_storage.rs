@@ -1,5 +1,3 @@
-//! Implementations of the generic interfaces provided by this crate.
-
 use crate::{
     bit_set::BitSet,
     id::{SparseLinear, ValidId},
