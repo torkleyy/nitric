@@ -1,3 +1,4 @@
+//! Module defining the `BitSet` trait.
 
 /// `BitSet` trait which may or may not be hierarchical. This structure is used as storage mask
 /// to determine if components exist for certain IDs.

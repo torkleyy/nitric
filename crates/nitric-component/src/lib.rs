@@ -1,3 +1,6 @@
+#![warn(missing_docs)]
+#![deny(unused_must_use)]
+
 //! # `nitric-component`
 //!
 //! This crate implements component storages, providing a mapping from IDs / Entities to data

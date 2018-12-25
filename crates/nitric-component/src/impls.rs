@@ -1,4 +1,4 @@
-use std::borrow::Borrow;
+//! Implementations of the generic interfaces provided by this crate.
 
 use crate::{
     bit_set::BitSet,
@@ -27,7 +27,7 @@ where
     ID: SparseLinear,
 {
     data: Vec<C>,
-    data_indicies: Vec<usize>,
+    data_indices: Vec<usize>,
     ids: Vec<ID>,
     mask: ID::BitSet,
 }
@@ -61,7 +61,7 @@ where
     fn default() -> Self {
         TvStorage {
             data: vec![],
-            data_indicies: vec![],
+            data_indices: vec![],
             ids: vec![],
             mask: Default::default(),
         }
@@ -74,11 +74,11 @@ where
 {
     fn get<V>(&self, id: &V) -> Option<&<Self as Storage>::Component>
     where
-        ID: ValidId<Self::Id>,
+        V: ValidId<Self::Id>,
     {
         let id: usize = id.as_usize();
         if self.mask.contains(id) {
-            let data_index = self.data_indicies[id];
+            let data_index = self.data_indices[id];
             let data = &self.data[data_index];
 
             Some(data)
@@ -92,14 +92,14 @@ impl<ID, C> GetMut for TvStorage<ID, C>
 where
     ID: SparseLinear,
 {
-    fn get_mut<V>(&mut self, id: &V) -> Option<&<Self as Storage>::Component>
+    fn get_mut<V>(&mut self, id: &V) -> Option<&mut <Self as Storage>::Component>
     where
         V: ValidId<Self::Id>,
     {
         let id: usize = id.as_usize();
         if self.mask.contains(id) {
-            let data_index = self.data_indicies[id];
-            let data = &self.data[data_index];
+            let data_index = self.data_indices[id];
+            let data = &mut self.data[data_index];
 
             Some(data)
         } else {
@@ -118,7 +118,7 @@ where
         component: <Self as Storage>::Component,
     ) -> Option<<Self as Storage>::Component>
     where
-        ID: ValidId<Self::Id>,
+        V: ValidId<Self::Id>,
     {
         use std::iter::repeat;
         use std::mem::replace;
@@ -126,16 +126,18 @@ where
         let id: usize = id_orig.as_usize();
 
         if self.mask.add(id) {
-            Some(replace(self.get_mut(&id_orig), component))
+            Some(replace(self.get_mut(&id_orig).unwrap(), component))
         } else {
-            if self.data_indicies.len() <= id {
-                let delta = id + 1 - self.data_indicies.len();
-                self.data_indicies.extend(repeat(0).take(delta));
+            if self.data_indices.len() <= id {
+                let delta = id + 1 - self.data_indices.len();
+                self.data_indices.extend(repeat(0).take(delta));
             }
 
-            self.data_indicies[id] = self.data.len();
-            self.ids.push(id_orig);
+            self.data_indices[id] = self.data.len();
+            self.ids.push(id_orig.into_inner());
             self.data.push(component);
+
+            None
         }
     }
 }

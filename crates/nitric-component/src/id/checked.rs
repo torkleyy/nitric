@@ -1,4 +1,4 @@
-use std::{borrow::Borrow, marker::PhantomData};
+use std::marker::PhantomData;
 
 use derivative::Derivative;
 
@@ -40,13 +40,6 @@ where
     }
 }
 
-impl<'allocator, ID> CheckedId<'allocator, ID> {
-    /// Moves out the inner ID.
-    pub fn into_inner(self) -> ID {
-        self.id
-    }
-}
-
 /// Implementation of `AsUsize` for checked ID, which is only required for generic programming.
 /// If you have the concrete type, use `ValidId::as_usize` instead.
 ///
@@ -60,23 +53,11 @@ where
     }
 }
 
-impl<'allocator, ID> Borrow<ID> for CheckedId<'allocator, ID> {
-    fn borrow(&self) -> &ID {
-        &self.id
-    }
-}
-
 impl<'allocator, ID> Id for CheckedId<'allocator, ID>
 where
     ID: Id + 'allocator,
 {
     type Allocator = PhantomAllocator<'allocator, Self, ID>;
-}
-
-impl<'allocator, ID> Into<ID> for CheckedId<'allocator, ID> {
-    fn into(self) -> ID {
-        self.into_inner()
-    }
 }
 
 unsafe impl<'allocator, ID> ValidId<ID> for CheckedId<'allocator, ID>
@@ -85,5 +66,13 @@ where
 {
     fn as_usize(&self) -> usize {
         self.u_repr
+    }
+
+    fn as_inner(&self) -> &ID {
+        &self.id
+    }
+
+    fn into_inner(self) -> ID {
+        self.id
     }
 }

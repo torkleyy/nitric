@@ -1,3 +1,9 @@
+//! Error types
+//!
+//! The general strategy of this crate is to avoid sum error types, or if necessary to only include
+//! the variants that are actually possible for that function.
+//!
+
 use std::fmt::Debug;
 
 /// Error returned when the ID is invalid.

@@ -6,13 +6,13 @@
 
 pub use self::phantom::PhantomAllocator;
 
+use crate::id::AsUsize;
+use crate::id::CheckedId;
 use crate::id::ValidId;
 use crate::{
     error::{InvalidIdError, OomError},
     id::Id,
 };
-use crate::id::AsUsize;
-use crate::id::CheckedId;
 
 mod phantom;
 
@@ -77,7 +77,9 @@ where
     /// This has a naive default implementation that can be replaced with a custom one if required.
     fn create_checked(&mut self) -> Result<CheckedId<'_, Self::Id>, OomError> {
         let id = self.create()?;
-        let checked = id.checked(&*self).expect("The ID was just created, it cannot be invalid");
+        let checked = id
+            .checked(&*self)
+            .expect("The ID was just created, it cannot be invalid");
 
         Ok(checked)
     }

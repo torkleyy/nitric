@@ -5,7 +5,7 @@
 
 pub use self::checked::CheckedId;
 
-use std::{borrow::Borrow, fmt::Debug, hash::Hash};
+use std::{fmt::Debug, hash::Hash};
 
 use crate::{allocator::Allocator, bit_set::BitSet, error::InvalidIdError};
 
@@ -90,10 +90,16 @@ pub trait SparseLinear: AsUsize + Id {
 /// # Memory safety
 ///
 /// Implementing this type without meeting the contract may produce memory safety bugs.
-pub unsafe trait ValidId<O: Id>: Borrow<O> + Id + Into<O> {
+pub unsafe trait ValidId<O: Id>: Id {
     /// Returns the `usize` representation of this ID.
     ///
     /// This operation cannot fail and is only available for IDs that have this property ensured
     /// at the type-level. For a dynamic version see `AsUsize::try_as_usize`.
     fn as_usize(&self) -> usize;
+
+    /// Borrows the wrapped ID.
+    fn as_inner(&self) -> &O;
+
+    /// Moves the wrapped ID out.
+    fn into_inner(self) -> O;
 }
