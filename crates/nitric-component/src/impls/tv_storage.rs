@@ -1,7 +1,7 @@
 use crate::{
     bit_set::BitSet,
     id::{SparseLinear, ValidId},
-    storage::{Get, GetMut, Insert, Storage},
+    storage::{Get, GetMut, Insert, Remove, Storage},
 };
 use std::fmt;
 use std::fmt::Debug;
@@ -26,7 +26,7 @@ where
 {
     data: Vec<C>,
     data_indices: Vec<usize>,
-    ids: Vec<ID>,
+    ids: Vec<usize>,
     mask: ID::BitSet,
 }
 
@@ -132,9 +132,36 @@ where
             }
 
             self.data_indices[id] = self.data.len();
-            self.ids.push(id_orig.into_inner());
+            self.ids.push(id);
             self.data.push(component);
 
+            None
+        }
+    }
+}
+
+impl<ID, C> Remove for TvStorage<ID, C>
+where
+    ID: SparseLinear,
+{
+    fn remove<V>(&mut self, id: &V) -> Option<<Self as Storage>::Component>
+    where
+        V: ValidId<Self::Id>,
+    {
+        let id = id.as_usize();
+
+        if self.mask.contains(id) {
+            let data_index = self.data_indices[id];
+            // Grab the usize representation of the ID at the end
+            let last_id = *self.ids.last().unwrap();
+
+            // the data for `last_index` will be found under `date_index` now, since we swap
+            // the last one with `data_index`.
+            self.data_indices[last_id] = data_index;
+            debug_assert_eq!(self.ids.swap_remove(data_index), id);
+
+            Some(self.data.swap_remove(data_index))
+        } else {
             None
         }
     }

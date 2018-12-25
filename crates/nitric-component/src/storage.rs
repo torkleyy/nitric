@@ -29,6 +29,16 @@ pub trait Insert: Storage {
         V: ValidId<Self::Id>;
 }
 
+/// Interface for removing a component by its ID.
+pub trait Remove: Storage {
+    /// Inserts `component` and associates it with `id`.
+    ///
+    /// Returns the previous component that was associated with `id` if there was any.
+    fn remove<V>(&mut self, id: &V) -> Option<Self::Component>
+    where
+        V: ValidId<Self::Id>;
+}
+
 /// Storage interface, mapping an `Id` to a `Component`.
 pub trait Storage {
     /// The ID which is used as key into the storage.
