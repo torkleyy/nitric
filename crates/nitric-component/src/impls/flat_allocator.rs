@@ -339,4 +339,53 @@ mod tests {
             assert_eq!(alloc.is_flagged(i), true);
         }
     }
+
+    #[test]
+    fn num_valid_hint() {
+        let mut alloc = FlatAllocator::new();
+
+        assert_eq!(alloc.num_valid_hint(), (0, Some(0)));
+
+        alloc.create().unwrap();
+
+        assert_eq!(alloc.num_valid_hint(), (0, Some(1)));
+
+        alloc.create().unwrap();
+        alloc.create().unwrap();
+        alloc.create().unwrap();
+
+        assert_eq!(alloc.num_valid_hint(), (0, Some(4)));
+
+        alloc.delete_valid(2);
+
+        assert_eq!(alloc.num_valid_hint(), (0, Some(4)));
+
+        alloc.merge_deleted();
+
+        assert_eq!(alloc.num_valid_hint(), (0, Some(4)));
+    }
+
+    #[test]
+    fn try_delete() {
+        let mut alloc = FlatAllocator::new();
+
+        for i in 0..100 {
+            assert_eq!(alloc.try_delete(i), Err(InvalidIdError(i)));
+        }
+
+        alloc.create().unwrap();
+        alloc.create().unwrap();
+        alloc.create().unwrap();
+
+        for i in 0..3 {
+            assert_eq!(alloc.try_delete(i), Ok(()));
+            assert_eq!(alloc.try_delete(i), Ok(()));
+        }
+
+        alloc.merge_deleted();
+
+        for i in 0..3 {
+            assert_eq!(alloc.try_delete(i), Err(InvalidIdError(i)));
+        }
+    }
 }
