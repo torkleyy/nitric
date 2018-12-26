@@ -154,7 +154,7 @@ where
     {
         let id = id.as_usize();
 
-        if self.mask.contains(id) {
+        if self.mask.remove(id) {
             let data_index = self.data_indices[id];
             // Grab the usize representation of the ID at the end
             let last_id = *self.ids.last().unwrap();
@@ -208,5 +208,103 @@ mod tests {
         for id in &ids {
             assert_eq!(empty.get(&id.checked(&alloc).unwrap()), None);
         }
+    }
+
+    #[test]
+    fn insert() {
+        let mut storage = new_storage();
+        let mut alloc = FlatAllocator::new();
+
+        let ids = (0..100)
+            .map(|_| alloc.create())
+            .collect::<Result<Vec<FlatUsize>, _>>()
+            .unwrap();
+
+        assert!(storage
+            .insert(ids[4].clone().checked(&alloc).unwrap(), Comp(41))
+            .is_none());
+        assert!(storage
+            .insert(ids[8].clone().checked(&alloc).unwrap(), Comp(21))
+            .is_none());
+        assert!(storage
+            .insert(ids[92].clone().checked(&alloc).unwrap(), Comp(17))
+            .is_none());
+
+        assert_eq!(
+            storage.insert(ids[8].clone().checked(&alloc).unwrap(), Comp(210)),
+            Some(Comp(21))
+        );
+    }
+
+    #[test]
+    fn remove() {
+        let mut storage = new_storage();
+        let mut alloc = FlatAllocator::new();
+
+        let ids = (0..100)
+            .map(|_| alloc.create())
+            .collect::<Result<Vec<FlatUsize>, _>>()
+            .unwrap();
+        let checked = ids
+            .into_iter()
+            .map(|i| i.checked(&alloc))
+            .collect::<Result<Vec<_>, _>>()
+            .unwrap();
+
+        assert!(storage.remove(&checked[3]).is_none());
+        assert!(storage.remove(&checked[11]).is_none());
+        assert!(storage.remove(&checked[65]).is_none());
+
+        storage.insert(checked[25].clone(), Comp(25));
+
+        assert_eq!(storage.remove(&checked[25]), Some(Comp(25)));
+        assert_eq!(storage.remove(&checked[25]), None);
+    }
+
+    #[test]
+    fn get() {
+        let mut storage = new_storage();
+        let mut alloc = FlatAllocator::new();
+
+        let ids = (0..100)
+            .map(|_| alloc.create())
+            .collect::<Result<Vec<FlatUsize>, _>>()
+            .unwrap();
+        let checked = ids
+            .into_iter()
+            .map(|i| i.checked(&alloc))
+            .collect::<Result<Vec<_>, _>>()
+            .unwrap();
+
+        storage.insert(checked[12].clone(), Comp(25));
+
+        assert_eq!(storage.get(&checked[12]), Some(&Comp(25)));
+        assert_eq!(storage.get(&checked[12]), Some(&Comp(25)));
+        assert_eq!(storage.get(&checked[25]), None);
+        assert_eq!(storage.get(&checked[25]), None);
+    }
+
+    #[test]
+    fn get_mut() {
+        let mut storage = new_storage();
+        let mut alloc = FlatAllocator::new();
+
+        let ids = (0..100)
+            .map(|_| alloc.create())
+            .collect::<Result<Vec<FlatUsize>, _>>()
+            .unwrap();
+        let checked = ids
+            .into_iter()
+            .map(|i| i.checked(&alloc))
+            .collect::<Result<Vec<_>, _>>()
+            .unwrap();
+
+        storage.insert(checked[12].clone(), Comp(25));
+
+        assert_eq!(storage.get_mut(&checked[25]), None);
+        assert_eq!(storage.get_mut(&checked[12]), Some(&mut Comp(25)));
+        *storage.get_mut(&checked[12]).unwrap() = Comp(11);
+
+        assert_eq!(storage.get_mut(&checked[12]), Some(&mut Comp(11)));
     }
 }
