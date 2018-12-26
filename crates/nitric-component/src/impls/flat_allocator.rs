@@ -297,4 +297,46 @@ mod tests {
         alloc.merge_deleted();
         assert_eq!(alloc.num_valid(), 0);
     }
+
+    #[test]
+    fn is_flagged() {
+        let mut alloc = FlatAllocator::new();
+
+        for i in 0..100 {
+            assert_eq!(alloc.is_flagged(i), false);
+        }
+        
+        for i in 0..3 {
+            alloc.create().unwrap();
+            assert_eq!(alloc.is_flagged(i), false);
+        }
+
+        for i in 0..3 {
+            assert_eq!(alloc.is_flagged(i), false);
+            alloc.delete_valid(i);
+            assert_eq!(alloc.is_flagged(i), true);
+        }
+
+        alloc.merge_deleted();
+
+        for i in 0..3 {
+            assert_eq!(alloc.is_flagged(i), false);
+        }
+
+        for _ in 0..3 {
+            alloc.create().unwrap();
+        }
+
+        for i in 0..3 {
+            assert_eq!(alloc.is_flagged(i), false);
+        }
+
+        assert_eq!(alloc.is_flagged(3), false);
+
+        for i in 0..3 {
+            assert_eq!(alloc.is_flagged(i), false);
+            alloc.delete_valid(i);
+            assert_eq!(alloc.is_flagged(i), true);
+        }
+    }
 }
