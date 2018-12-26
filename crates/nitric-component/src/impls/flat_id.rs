@@ -30,6 +30,8 @@ unsafe impl Allocator for FlatAllocator {
 /// # Examples
 ///
 /// ```
+/// use nitric_component::impls::FlatUsize;
+///
 /// #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 /// pub struct ClientId(pub FlatUsize);
 ///
