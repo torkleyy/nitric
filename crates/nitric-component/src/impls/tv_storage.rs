@@ -183,7 +183,7 @@ where
 mod tests {
     use super::*;
     use crate::{
-        allocator::Create,
+        allocator::{Create, CreateChecked},
         id::AsUsize,
         impls::{FlatAllocator, FlatUsize},
     };
@@ -259,6 +259,21 @@ mod tests {
 
         assert_eq!(storage.remove(&checked[25]), Some(Comp(25)));
         assert_eq!(storage.remove(&checked[25]), None);
+    }
+
+    #[test]
+    fn double_remove() {
+        let mut storage = new_storage();
+        let mut alloc = FlatAllocator::new();
+
+        let id = alloc.create_checked().unwrap();
+
+        assert_eq!(storage.remove(&id), None);
+        storage.insert(id, Comp(1));
+        assert_eq!(storage.remove(&id), Some(Comp(1)));
+        assert_eq!(storage.remove(&id), None);
+        storage.insert(id, Comp(2));
+        assert_eq!(storage.remove(&id), Some(Comp(2)));
     }
 
     #[test]

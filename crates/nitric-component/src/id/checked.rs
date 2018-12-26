@@ -9,7 +9,7 @@ use crate::{allocator::PhantomAllocator, error::InvalidIdError, id::AsUsize, id:
 /// Implements `ValidId` to allow calling methods that expect `ValidId`s, and can thus skip validity
 /// checks. This means we can ensure at type-level that a function cannot fail.
 #[derive(Derivative)]
-#[derivative(Clone, Debug, Eq, Hash, PartialEq)]
+#[derivative(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub struct CheckedId<'allocator, ID: Id> {
     /// The wrapped ID which can be extracted using this field or moved out using `into_inner`.
     pub id: ID,
