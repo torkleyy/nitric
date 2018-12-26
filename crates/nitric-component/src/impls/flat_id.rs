@@ -1,31 +1,10 @@
-use crate::id::Id;
-use crate::allocator::Allocator;
+use crate::{
+    error::InvalidIdError,
+    id::{AsUsize, Id, SparseLinear},
+    impls::{FlatAllocator, FlatBitSet},
+};
 
-pub struct FlatAllocator {
-
-}
-
-impl FlatAllocator {
-
-}
-
-unsafe impl Allocator for FlatAllocator {
-    type Id = FlatUsize;
-
-    fn is_valid(&self, id: &<Self as Allocator>::Id) -> bool {
-        unimplemented!()
-    }
-
-    fn num_valid(&self) -> usize {
-        unimplemented!()
-    }
-
-    fn num_valid_hint(&self) -> Option<usize> {
-        unimplemented!()
-    }
-}
-
-/// A `usize`-based ID with a sparse allocator and a `FlatBitSet`.
+/// A `usize`-based ID using the `FlatAllocator` and a `FlatBitSet`.
 ///
 /// # Examples
 ///
@@ -49,6 +28,32 @@ impl FlatUsize {
     }
 }
 
+impl AsUsize for FlatUsize {
+    fn try_as_usize(&self, allocator: &FlatAllocator) -> Result<usize, InvalidIdError<Self>> {
+        if allocator.is_valid(self.inner) {
+            Ok(self.inner)
+        } else {
+            Err(InvalidIdError(*self))
+        }
+    }
+}
+
+impl From<usize> for FlatUsize {
+    fn from(inner: usize) -> Self {
+        FlatUsize { inner }
+    }
+}
+
+impl Into<usize> for FlatUsize {
+    fn into(self) -> usize {
+        self.inner
+    }
+}
+
 impl Id for FlatUsize {
     type Allocator = FlatAllocator;
+}
+
+impl SparseLinear for FlatUsize {
+    type BitSet = FlatBitSet;
 }

@@ -57,7 +57,7 @@ impl<'allocator, ID> Id for CheckedId<'allocator, ID>
 where
     ID: Id + 'allocator,
 {
-    type Allocator = PhantomAllocator<'allocator, Self, ID>;
+    type Allocator = PhantomAllocator;
 }
 
 unsafe impl<'allocator, ID> ValidId<ID> for CheckedId<'allocator, ID>

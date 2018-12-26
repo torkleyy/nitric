@@ -17,6 +17,13 @@ pub unsafe trait BitSet: Sized + Default {
     /// Does nothing (and returns `false`) if the bit was zero already.
     fn remove(&mut self, bit: usize) -> bool;
 
+    /// Removes the first bit set to `1` and returns its position. Returns `None` if the bit set is
+    /// empty.
+    fn pop_front(&mut self) -> Option<usize>;
+
     /// Checks if `bit` is set.
     fn contains(&self, bit: usize) -> bool;
+
+    /// Count the number of set bits.
+    fn count(&self) -> usize;
 }

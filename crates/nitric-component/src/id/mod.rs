@@ -53,7 +53,7 @@ pub trait Continuous: AsUsize {}
 /// Top-level trait that all IDs must implement.
 pub trait Id: Clone + Debug + Hash + Eq + Sized {
     /// The allocator which manages IDs of this type.
-    type Allocator: Allocator<Id = Self> + ?Sized;
+    type Allocator: Allocator<Self> + ?Sized;
 }
 
 /// An ID that can be used for sparse storages and behaves somewhat linear, meaning it starts at

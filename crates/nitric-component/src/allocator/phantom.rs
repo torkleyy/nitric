@@ -1,30 +1,21 @@
-use crate::allocator::Allocator;
-use crate::id::Id;
-use std::marker::PhantomData;
+use crate::{
+    allocator::Allocator,
+    id::Id
+};
 
 /// Phantom allocator type required to implement `Id` for wrapper IDs that uphold additional
 /// guarantees. This can never be instantiated and is only meant to be used for the associated
 /// `Self::Allocator` type.
-///
-/// # Generics
-///
-/// * `ID`: wrapper ID
-/// * `O`: original ID
-pub struct PhantomAllocator<'a, ID, O> {
-    _marker1: PhantomData<&'a ID>,
-    _marker2: PhantomData<&'a O>,
+pub struct PhantomAllocator {
     never: Never,
 }
 
 // Unsafety: `is_valid` holds the contract (as it can never be called).
-unsafe impl<'a, ID, O> Allocator for PhantomAllocator<'a, ID, O>
+unsafe impl<ID> Allocator<ID> for PhantomAllocator
 where
-    ID: Id<Allocator = Self> + 'a,
-    O: Id + 'a,
+    ID: Id<Allocator = Self>,
 {
-    type Id = ID;
-
-    fn is_valid(&self, _: &<Self as Allocator>::Id) -> bool {
+    fn is_valid(&self, _: &ID) -> bool {
         match self.never {}
     }
 
@@ -32,7 +23,7 @@ where
         match self.never {}
     }
 
-    fn num_valid_hint(&self) -> Option<usize> {
+    fn num_valid_hint(&self) -> (usize, Option<usize>) {
         match self.never {}
     }
 }

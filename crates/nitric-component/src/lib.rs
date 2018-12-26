@@ -34,6 +34,7 @@
 //! * `impls`
 //!
 //! Additionally, error types can be found in `error`.
+//! Utility types can be found in `util`.
 //!
 
 #[macro_use]
@@ -46,3 +47,5 @@ pub mod storage;
 
 pub mod error;
 pub mod impls;
+
+pub mod util;
