@@ -1,7 +1,4 @@
-use crate::{
-    allocator::Allocator,
-    id::Id
-};
+use crate::{allocator::Allocator, id::Id};
 
 /// Phantom allocator type required to implement `Id` for wrapper IDs that uphold additional
 /// guarantees. This can never be instantiated and is only meant to be used for the associated

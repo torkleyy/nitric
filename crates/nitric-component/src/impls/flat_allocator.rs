@@ -1,3 +1,4 @@
+use crate::allocator::MergeDeleted;
 use crate::{
     allocator::{Allocator, Create, CreateChecked, Delete},
     bit_set::BitSet,
@@ -58,10 +59,21 @@ impl FlatAllocator {
     /// Mirrors `Create::create`
     #[inline]
     pub fn create(&mut self) -> Result<usize, OomError> {
-        self.killed
+        let id = self
+            .killed
             .pop()
             .or_else(|| self.checked_inc())
-            .ok_or(OomError)
+            .ok_or(OomError)?;
+
+        self.alive.add(id);
+
+        Ok(id)
+    }
+
+    /// Mirrors `Delete::is_delete`
+    #[inline]
+    pub fn is_flagged(&self, id: usize) -> bool {
+        self.flagged.contains(id)
     }
 
     /// Mirrors `Delete::delete`
@@ -69,9 +81,7 @@ impl FlatAllocator {
     pub fn delete_valid(&mut self, id: usize) {
         debug_assert!(self.alive.contains(id));
 
-        if !self.flagged.add(id) {
-            self.killed.push(id);
-        }
+        self.flagged.add(id);
     }
 
     /// Mirrors `Delete::try_delete`
@@ -83,6 +93,18 @@ impl FlatAllocator {
         }
 
         Ok(())
+    }
+
+    /// Mirrors `MergeDeleted::merge_deleted`
+    pub fn merge_deleted(&mut self) -> &[usize] {
+        let start = self.killed.len();
+
+        while let Some(id) = self.flagged.pop_front() {
+            self.alive.remove(id);
+            self.killed.push(id);
+        }
+
+        &self.killed[start..]
     }
 }
 
@@ -107,6 +129,7 @@ impl<ID> Create<ID> for FlatAllocator
 where
     ID: Id<Allocator = Self> + From<usize> + Into<usize>,
 {
+    #[inline]
     fn create(&mut self) -> Result<ID, OomError> {
         self.create().map(From::from)
     }
@@ -116,6 +139,7 @@ impl<ID> CreateChecked<ID> for FlatAllocator
 where
     ID: Id<Allocator = Self> + AsUsize + From<usize> + Into<usize>,
 {
+    #[inline]
     fn create_checked(&mut self) -> Result<CheckedId<'_, ID>, OomError> {
         <FlatAllocator as Create<ID>>::create(self)
             .map(move |id| unsafe { CheckedId::new_from_fields(id.clone(), id.into(), &*self) })
@@ -126,6 +150,14 @@ impl<ID> Delete<ID> for FlatAllocator
 where
     ID: Id<Allocator = Self> + AsUsize + From<usize> + Into<usize>,
 {
+    #[inline]
+    fn is_flagged<V>(&mut self, id: &V) -> bool
+    where
+        V: ValidId<ID>,
+    {
+        FlatAllocator::is_flagged(self, id.as_usize())
+    }
+
     fn delete<V>(&mut self, id: &V)
     where
         V: ValidId<ID>,
@@ -139,3 +171,130 @@ where
     }
 }
 
+impl<ID> MergeDeleted<ID> for FlatAllocator
+where
+    ID: Id<Allocator = Self> + From<usize> + Into<usize>,
+{
+    fn merge_deleted(&mut self) -> Vec<ID> {
+        self.merge_deleted()
+            .into_iter()
+            .cloned()
+            .map(Into::into)
+            .collect()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn new() {
+        let empty = FlatAllocator::new();
+
+        for i in 0..100 {
+            assert_eq!(empty.is_valid(i), false);
+        }
+    }
+
+    #[test]
+    fn checked_inc() {
+        let mut empty = FlatAllocator::new();
+
+        assert_eq!(empty.counter, 0);
+        assert_eq!(empty.checked_inc(), Some(0));
+        assert_eq!(empty.checked_inc(), Some(1));
+        assert_eq!(empty.checked_inc(), Some(2));
+
+        empty.counter = usize::max_value();
+
+        assert_eq!(empty.checked_inc(), None);
+    }
+
+    #[test]
+    fn is_valid() {
+        let mut alloc = FlatAllocator::new();
+
+        for i in 0..3 {
+            alloc.create().unwrap();
+            assert_eq!(alloc.is_valid(i), true);
+        }
+
+        assert_eq!(alloc.is_valid(3), false);
+
+        for i in 0..3 {
+            assert_eq!(alloc.is_valid(i), true);
+            alloc.delete_valid(i);
+            assert_eq!(alloc.is_valid(i), true);
+        }
+
+        alloc.merge_deleted();
+
+        for i in 0..3 {
+            assert_eq!(alloc.is_valid(i), false);
+        }
+
+        for _ in 0..3 {
+            alloc.create().unwrap();
+        }
+
+        for i in 0..3 {
+            assert_eq!(alloc.is_valid(i), true);
+        }
+
+        assert_eq!(alloc.is_valid(3), false);
+
+        for i in 0..3 {
+            assert_eq!(alloc.is_valid(i), true);
+            alloc.delete_valid(i);
+            assert_eq!(alloc.is_valid(i), true);
+        }
+    }
+
+    #[test]
+    fn num_valid() {
+        let mut alloc = FlatAllocator::new();
+
+        for i in 0..3 {
+            assert_eq!(alloc.num_valid(), i);
+            alloc.create().unwrap();
+            assert_eq!(alloc.num_valid(), i + 1);
+        }
+
+        assert_eq!(alloc.num_valid(), 3);
+
+        for i in 0..3 {
+            alloc.delete_valid(i);
+            assert_eq!(alloc.num_valid(), 3);
+        }
+
+        alloc.merge_deleted();
+        assert_eq!(alloc.num_valid(), 0);
+
+        let a = alloc.create().unwrap();
+        assert_eq!(alloc.num_valid(), 1);
+        let b = alloc.create().unwrap();
+        alloc.delete_valid(b);
+        assert_eq!(alloc.num_valid(), 2);
+        alloc.merge_deleted();
+        assert_eq!(alloc.num_valid(), 1);
+        alloc.delete_valid(a);
+        alloc.merge_deleted();
+
+        for i in 0..3 {
+            assert_eq!(alloc.num_valid(), i);
+            alloc.create().unwrap();
+            assert_eq!(alloc.num_valid(), i + 1);
+        }
+
+        assert_eq!(alloc.num_valid(), 3);
+
+        for i in 0..3 {
+            alloc.delete_valid(i);
+            assert_eq!(alloc.num_valid(), 3);
+        }
+
+        alloc.merge_deleted();
+        assert_eq!(alloc.num_valid(), 0);
+    }
+}

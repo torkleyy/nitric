@@ -74,6 +74,8 @@ pub trait CreateChecked<ID>: Allocator<ID> + Create<ID>
 where
     ID: AsUsize + Id<Allocator = Self>,
 {
+    // TODO: consider associated type so it's not exclusive to usize based IDs
+
     /// Creates a new ID of type `<Self as Allocator>::Id` and wraps it in a `CheckedId`.
     /// Also see `Create::create`.
     ///
@@ -99,18 +101,26 @@ pub trait Delete<ID>: Allocator<ID>
 where
     ID: Id<Allocator = Self>,
 {
-    /// Deletes a previously created ID that is guaranteed to be valid.
+    /// Returns `true` if `id` is flagged for deletion.
+    fn is_flagged<V>(&mut self, id: &V) -> bool
+    where
+        V: ValidId<ID>;
+
+    /// Flags a previously created ID that is guaranteed to be valid for deletion.
     /// For deleting eventually valid IDs, see `try_delete`.
     ///
-    /// In case your allocator supports atomic ID creation, you should implement this for `&Self`,
+    /// In case your allocator supports atomic ID deletion, you should implement this for `&Self`,
     /// too.
     ///
     /// # Behavior
     ///
-    /// This is not guaranteed to actually delete the ID. This just flags it for deletion;
-    /// the allocator is free to require calling further methods for an actual deletion to happen.
+    /// This does not actually delete the ID. This just flags it for deletion; the allocator will
+    /// require calling further methods for an actual deletion to happen.
     ///
-    /// TODO: list common examples here
+    /// Most commonly, this function is `MergeDeleted::merge_deleted`.
+    ///
+    /// Calling this method twice with the same ID is perfectly correct, since IDs stay valid beyond
+    /// a call to `delete`.
     ///
     /// # Panics
     ///
@@ -119,7 +129,7 @@ where
     where
         V: ValidId<ID>;
 
-    /// Deletes a previously created ID, failing if the ID is invalid.
+    /// Flags a previously created ID for deletion, failing if the ID is invalid.
     /// See `Delete::delete`.
     fn try_delete(&mut self, id: &ID) -> Result<(), InvalidIdError<ID>>;
 
@@ -128,4 +138,13 @@ where
     fn assert_deleted(&mut self, id: &ID) {
         let _ = self.try_delete(id);
     }
+}
+
+/// Interface for deleting IDs flagged by `Delete::delete` without additional parameters.
+pub trait MergeDeleted<ID>: Allocator<ID>
+where
+    ID: Id<Allocator = Self>,
+{
+    /// Deletes all IDs that were flagged for deletion by `Delete::delete`.
+    fn merge_deleted(&mut self) -> Vec<ID>;
 }
