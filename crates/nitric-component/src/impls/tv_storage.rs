@@ -185,7 +185,7 @@ mod tests {
     use crate::{
         allocator::Create,
         id::AsUsize,
-        impls::{FlatAllocator, FlatUsize}
+        impls::{FlatAllocator, FlatUsize},
     };
 
     #[derive(Clone, Debug, Eq, PartialEq)]
@@ -200,7 +200,10 @@ mod tests {
         let empty = new_storage();
         let mut alloc = FlatAllocator::new();
 
-        let ids = (0..100).map(|_| alloc.create()).collect::<Result<Vec<FlatUsize>, _>>().unwrap();
+        let ids = (0..100)
+            .map(|_| alloc.create())
+            .collect::<Result<Vec<FlatUsize>, _>>()
+            .unwrap();
 
         for id in &ids {
             assert_eq!(empty.get(&id.checked(&alloc).unwrap()), None);

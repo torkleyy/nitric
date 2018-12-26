@@ -1,5 +1,5 @@
 use crate::{
-    allocator::{Allocator,},
+    allocator::Allocator,
     error::InvalidIdError,
     id::{AsUsize, Id, SparseLinear},
     impls::{FlatAllocator, FlatBitSet},

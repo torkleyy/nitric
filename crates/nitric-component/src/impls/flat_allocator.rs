@@ -1,17 +1,8 @@
 use crate::{
-    allocator::{
-        MergeDeleted,
-        Allocator,
-        Create,
-        CreateChecked,
-        Delete
-    },
+    allocator::{Allocator, Create, CreateChecked, Delete, MergeDeleted},
     error::{InvalidIdError, OomError},
     id::{CheckedId, ValidId},
-    impls::{
-        FlatUsize,
-        UsizeAllocator
-    }
+    impls::{FlatUsize, UsizeAllocator},
 };
 
 /// Wrapper for `UsizeAllocator` returning `FlatUsize`.

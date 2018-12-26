@@ -1,4 +1,3 @@
-
 use crate::{
     bit_set::BitSet,
     error::{InvalidIdError, OomError},
