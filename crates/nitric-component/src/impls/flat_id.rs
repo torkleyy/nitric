@@ -1,4 +1,5 @@
 use crate::{
+    allocator::{Allocator,},
     error::InvalidIdError,
     id::{AsUsize, Id, SparseLinear},
     impls::{FlatAllocator, FlatBitSet},
@@ -30,7 +31,7 @@ impl FlatUsize {
 
 impl AsUsize for FlatUsize {
     fn try_as_usize(&self, allocator: &FlatAllocator) -> Result<usize, InvalidIdError<Self>> {
-        if allocator.is_valid(self.inner) {
+        if allocator.is_valid(&self) {
             Ok(self.inner)
         } else {
             Err(InvalidIdError(*self))

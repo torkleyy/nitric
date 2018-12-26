@@ -178,3 +178,32 @@ where
     type Id = ID;
     type Component = C;
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::{
+        allocator::Create,
+        id::AsUsize,
+        impls::{FlatAllocator, FlatUsize}
+    };
+
+    #[derive(Clone, Debug, Eq, PartialEq)]
+    pub struct Comp(u32);
+
+    fn new_storage() -> TvStorage<FlatUsize, Comp> {
+        TvStorage::new()
+    }
+
+    #[test]
+    fn new() {
+        let empty = new_storage();
+        let mut alloc = FlatAllocator::new();
+
+        let ids = (0..100).map(|_| alloc.create()).collect::<Result<Vec<FlatUsize>, _>>().unwrap();
+
+        for id in &ids {
+            assert_eq!(empty.get(&id.checked(&alloc).unwrap()), None);
+        }
+    }
+}
