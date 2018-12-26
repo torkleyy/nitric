@@ -70,6 +70,7 @@ impl<ID, C> Get for TvStorage<ID, C>
 where
     ID: SparseLinear,
 {
+    #[inline]
     fn get<V>(&self, id: &V) -> Option<&<Self as Storage>::Component>
     where
         V: ValidId<Self::Id>,
@@ -90,6 +91,7 @@ impl<ID, C> GetMut for TvStorage<ID, C>
 where
     ID: SparseLinear,
 {
+    #[inline]
     fn get_mut<V>(&mut self, id: &V) -> Option<&mut <Self as Storage>::Component>
     where
         V: ValidId<Self::Id>,
@@ -110,6 +112,7 @@ impl<ID, C> Insert for TvStorage<ID, C>
 where
     ID: SparseLinear,
 {
+    #[inline]
     fn insert<V>(
         &mut self,
         id_orig: V,
@@ -144,6 +147,7 @@ impl<ID, C> Remove for TvStorage<ID, C>
 where
     ID: SparseLinear,
 {
+    #[inline]
     fn remove<V>(&mut self, id: &V) -> Option<<Self as Storage>::Component>
     where
         V: ValidId<Self::Id>,

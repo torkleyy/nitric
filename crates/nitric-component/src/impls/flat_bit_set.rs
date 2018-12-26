@@ -44,6 +44,7 @@ unsafe impl BitSet for FlatBitSet {
         old
     }
 
+    #[inline]
     fn remove(&mut self, bit: usize) -> bool {
         let pos = bit / Self::NUM_BITS;
         let shift = bit % Self::NUM_BITS;
@@ -61,6 +62,7 @@ unsafe impl BitSet for FlatBitSet {
         }
     }
 
+    #[inline]
     fn pop_front(&mut self) -> Option<usize> {
         let pos = self.bits.iter().position(|n| *n != 0)?;
         let mpos = pos * Self::NUM_BITS;
@@ -72,6 +74,7 @@ unsafe impl BitSet for FlatBitSet {
             .map(|n| n + mpos)
     }
 
+    #[inline]
     fn contains(&self, bit: usize) -> bool {
         let pos = bit / Self::NUM_BITS;
         let shift = bit % Self::NUM_BITS;
@@ -84,6 +87,7 @@ unsafe impl BitSet for FlatBitSet {
         }
     }
 
+    #[inline]
     fn count(&self) -> usize {
         self.bits.iter().map(|n| n.count_ones() as usize).sum()
     }

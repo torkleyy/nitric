@@ -135,6 +135,7 @@ where
 
     /// Makes sure `id` is deleted, ignoring the case where deletion fails due to an invalid ID.
     /// See `Delete::delete`.
+    #[inline]
     fn assert_deleted(&mut self, id: &ID) {
         let _ = self.try_delete(id);
     }
