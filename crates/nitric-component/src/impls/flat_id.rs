@@ -24,7 +24,7 @@ pub struct FlatUsize {
 
 impl FlatUsize {
     /// Returns the inner `usize`.
-    pub fn get(&self) -> usize {
+    pub fn get_inner(&self) -> usize {
         self.inner
     }
 }
@@ -57,4 +57,24 @@ impl Id for FlatUsize {
 
 impl SparseLinear for FlatUsize {
     type BitSet = FlatBitSet;
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::allocator::*;
+
+    #[test]
+    fn invalid_id() {
+        let (mut alloc, mut merger) = FlatAllocator::new();
+
+        let id = alloc.create().unwrap();
+
+        assert_eq!(id.try_as_usize(&alloc), Ok(id.get_inner()));
+
+        alloc.delete(&id.checked(&alloc, &merger).unwrap());
+        alloc.merge_deleted(&mut merger);
+
+        assert_eq!(id.try_as_usize(&alloc), Err(InvalidIdError(id)));
+    }
 }

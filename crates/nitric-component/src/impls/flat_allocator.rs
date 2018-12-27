@@ -101,6 +101,22 @@ mod tests {
     use crate::id::{AsUsize, ValidId};
 
     #[test]
+    fn assert_deleted() {
+        let (mut alloc, mut merger) = FlatAllocator::new();
+
+        let a = alloc.create().unwrap();
+        alloc.assert_deleted(&a);
+
+        assert!(alloc.is_valid(&a));
+
+        alloc.merge_deleted(&mut merger);
+
+        assert!(!alloc.is_valid(&a));
+        alloc.assert_deleted(&a);
+        assert!(!alloc.is_valid(&a));
+    }
+
+    #[test]
     fn checked() {
         let (mut alloc, mut merger) = FlatAllocator::new();
 
@@ -118,5 +134,20 @@ mod tests {
 
         // println!("{}, {}", b.as_usize(), c.as_usize()); <-- would fail since we cannot hold
         //                                                     `merger` until here
+    }
+
+    #[test]
+    fn try_delete() {
+        let (mut alloc, mut merger) = FlatAllocator::new();
+
+        let a = alloc.create().unwrap();
+        let b = alloc.create_checked(&merger).unwrap();
+
+        alloc.try_delete(&a).unwrap();
+        alloc.try_delete(b.id()).unwrap();
+        alloc.merge_deleted(&mut merger);
+
+        assert_eq!(alloc.num_valid(), 0);
+        assert_eq!(alloc.num_valid_hint().1, Some(2));
     }
 }
