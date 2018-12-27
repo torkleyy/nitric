@@ -2,7 +2,11 @@ use std::marker::PhantomData;
 
 use derivative::Derivative;
 
-use crate::{allocator::PhantomAllocator, error::InvalidIdError, id::AsUsize, id::Id, id::ValidId};
+use crate::{
+    allocator::{Merger, PhantomAllocator},
+    error::InvalidIdError,
+    id::{AsUsize, Id, ValidId},
+};
 
 /// Represents an ID that is guaranteed to be valid.
 ///
@@ -10,14 +14,14 @@ use crate::{allocator::PhantomAllocator, error::InvalidIdError, id::AsUsize, id:
 /// checks. This means we can ensure at type-level that a function cannot fail.
 #[derive(Derivative)]
 #[derivative(Clone, Copy, Debug, Eq, Hash, PartialEq)]
-pub struct CheckedId<'allocator, ID: Id> {
+pub struct CheckedId<'merger, ID: Id> {
     /// The wrapped ID which can be extracted using this field or moved out using `into_inner`.
     pub id: ID,
     u_repr: usize,
-    _allocator: PhantomData<&'allocator ID::Allocator>,
+    _merger: PhantomData<&'merger Merger<ID::Allocator>>,
 }
 
-impl<'allocator, ID> CheckedId<'allocator, ID>
+impl<'merger, ID> CheckedId<'merger, ID>
 where
     ID: Id,
 {
@@ -30,12 +34,12 @@ where
     pub unsafe fn new_from_fields(
         id: ID,
         u_repr: usize,
-        _allocator: &'allocator ID::Allocator,
+        _merger: &'merger Merger<ID::Allocator>,
     ) -> Self {
         CheckedId {
             id,
             u_repr,
-            _allocator: PhantomData,
+            _merger: PhantomData,
         }
     }
 }
@@ -44,25 +48,25 @@ where
 /// If you have the concrete type, use `ValidId::as_usize` instead.
 ///
 /// `try_as_usize` always returns `Ok`.
-impl<'allocator, ID> AsUsize for CheckedId<'allocator, ID>
+impl<'merger, ID> AsUsize for CheckedId<'merger, ID>
 where
-    ID: Id + 'allocator,
+    ID: Id + 'merger,
 {
     fn try_as_usize(&self, _: &<Self as Id>::Allocator) -> Result<usize, InvalidIdError<Self>> {
         Ok(self.as_usize())
     }
 }
 
-impl<'allocator, ID> Id for CheckedId<'allocator, ID>
+impl<'merger, ID> Id for CheckedId<'merger, ID>
 where
-    ID: Id + 'allocator,
+    ID: Id + 'merger,
 {
     type Allocator = PhantomAllocator;
 }
 
-unsafe impl<'allocator, ID> ValidId<ID> for CheckedId<'allocator, ID>
+unsafe impl<'merger, ID> ValidId<ID> for CheckedId<'merger, ID>
 where
-    ID: Id + 'allocator,
+    ID: Id + 'merger,
 {
     fn as_usize(&self) -> usize {
         self.u_repr

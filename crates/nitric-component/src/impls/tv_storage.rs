@@ -198,7 +198,7 @@ mod tests {
     #[test]
     fn new() {
         let empty = new_storage();
-        let mut alloc = FlatAllocator::new();
+        let (mut alloc, merger) = FlatAllocator::new();
 
         let ids = (0..100)
             .map(|_| alloc.create())
@@ -206,14 +206,14 @@ mod tests {
             .unwrap();
 
         for id in &ids {
-            assert_eq!(empty.get(&id.checked(&alloc).unwrap()), None);
+            assert_eq!(empty.get(&id.checked(&alloc, &merger).unwrap()), None);
         }
     }
 
     #[test]
     fn insert() {
         let mut storage = new_storage();
-        let mut alloc = FlatAllocator::new();
+        let (mut alloc, merger) = FlatAllocator::new();
 
         let ids = (0..100)
             .map(|_| alloc.create())
@@ -221,17 +221,17 @@ mod tests {
             .unwrap();
 
         assert!(storage
-            .insert(ids[4].clone().checked(&alloc).unwrap(), Comp(41))
+            .insert(ids[4].clone().checked(&alloc, &merger).unwrap(), Comp(41))
             .is_none());
         assert!(storage
-            .insert(ids[8].clone().checked(&alloc).unwrap(), Comp(21))
+            .insert(ids[8].clone().checked(&alloc, &merger).unwrap(), Comp(21))
             .is_none());
         assert!(storage
-            .insert(ids[92].clone().checked(&alloc).unwrap(), Comp(17))
+            .insert(ids[92].clone().checked(&alloc, &merger).unwrap(), Comp(17))
             .is_none());
 
         assert_eq!(
-            storage.insert(ids[8].clone().checked(&alloc).unwrap(), Comp(210)),
+            storage.insert(ids[8].clone().checked(&alloc, &merger).unwrap(), Comp(210)),
             Some(Comp(21))
         );
     }
@@ -239,7 +239,7 @@ mod tests {
     #[test]
     fn remove() {
         let mut storage = new_storage();
-        let mut alloc = FlatAllocator::new();
+        let (mut alloc, merger) = FlatAllocator::new();
 
         let ids = (0..100)
             .map(|_| alloc.create())
@@ -247,7 +247,7 @@ mod tests {
             .unwrap();
         let checked = ids
             .into_iter()
-            .map(|i| i.checked(&alloc))
+            .map(|i| i.checked(&alloc, &merger))
             .collect::<Result<Vec<_>, _>>()
             .unwrap();
 
@@ -264,9 +264,9 @@ mod tests {
     #[test]
     fn double_remove() {
         let mut storage = new_storage();
-        let mut alloc = FlatAllocator::new();
+        let (mut alloc, merger) = FlatAllocator::new();
 
-        let id = alloc.create_checked().unwrap();
+        let id = alloc.create_checked(&merger).unwrap();
 
         assert_eq!(storage.remove(&id), None);
         storage.insert(id, Comp(1));
@@ -279,7 +279,7 @@ mod tests {
     #[test]
     fn get() {
         let mut storage = new_storage();
-        let mut alloc = FlatAllocator::new();
+        let (mut alloc, merger) = FlatAllocator::new();
 
         let ids = (0..100)
             .map(|_| alloc.create())
@@ -287,7 +287,7 @@ mod tests {
             .unwrap();
         let checked = ids
             .into_iter()
-            .map(|i| i.checked(&alloc))
+            .map(|i| i.checked(&alloc, &merger))
             .collect::<Result<Vec<_>, _>>()
             .unwrap();
 
@@ -302,7 +302,7 @@ mod tests {
     #[test]
     fn get_mut() {
         let mut storage = new_storage();
-        let mut alloc = FlatAllocator::new();
+        let (mut alloc, merger) = FlatAllocator::new();
 
         let ids = (0..100)
             .map(|_| alloc.create())
@@ -310,7 +310,7 @@ mod tests {
             .unwrap();
         let checked = ids
             .into_iter()
-            .map(|i| i.checked(&alloc))
+            .map(|i| i.checked(&alloc, &merger))
             .collect::<Result<Vec<_>, _>>()
             .unwrap();
 

@@ -1,20 +1,29 @@
 use crate::{
-    allocator::{Allocator, Create, CreateChecked, Delete, MergeDeleted},
+    allocator::{Allocator, Create, CreateChecked, Delete, MergeDeleted, Merger},
     error::{InvalidIdError, OomError},
     id::{CheckedId, ValidId},
     impls::{FlatUsize, UsizeAllocator},
+    util::Reference,
 };
 
 /// Wrapper for `UsizeAllocator` returning `FlatUsize`.
-#[derive(Default)]
+#[derive(Debug)]
 pub struct FlatAllocator {
     inner: UsizeAllocator,
+    merger: Reference,
 }
 
 impl FlatAllocator {
-    /// Creates a fresh allocator.
-    pub fn new() -> Self {
-        Default::default()
+    /// Creates a fresh allocator and its associated merger for deleting IDs.
+    pub fn new() -> (Self, Merger<Self>) {
+        let merger = Merger::new();
+
+        let alloc = FlatAllocator {
+            inner: Default::default(),
+            merger: merger.instance_id().reference(),
+        };
+
+        (alloc, merger)
     }
 }
 
@@ -40,11 +49,13 @@ impl Create<FlatUsize> for FlatAllocator {
 }
 
 impl CreateChecked<FlatUsize> for FlatAllocator {
-    #[inline]
-    fn create_checked(&mut self) -> Result<CheckedId<'_, FlatUsize>, OomError> {
+    fn create_checked<'merger>(
+        &mut self,
+        merger: &'merger Merger<Self>,
+    ) -> Result<CheckedId<'merger, FlatUsize>, OomError> {
         self.inner
             .create()
-            .map(move |id| unsafe { CheckedId::new_from_fields(id.into(), id, &*self) })
+            .map(move |id| unsafe { CheckedId::new_from_fields(id.into(), id, merger) })
     }
 }
 
@@ -71,8 +82,10 @@ impl Delete<FlatUsize> for FlatAllocator {
     }
 }
 
-impl MergeDeleted<FlatUsize> for FlatAllocator {
-    fn merge_deleted(&mut self) -> Vec<FlatUsize> {
+unsafe impl MergeDeleted<FlatUsize> for FlatAllocator {
+    fn merge_deleted(&mut self, merger: &mut Merger<Self>) -> Vec<FlatUsize> {
+        merger.instance_id().assert_eq(&self.merger);
+
         self.inner
             .merge_deleted()
             .into_iter()

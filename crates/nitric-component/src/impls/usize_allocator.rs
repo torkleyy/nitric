@@ -5,7 +5,7 @@ use crate::{
 };
 
 /// A simple, non-atomic allocator that tries to return a free `usize`, bumps the counter otherwise.
-#[derive(Default)]
+#[derive(Debug, Default)]
 pub struct UsizeAllocator {
     /// Valid IDs
     alive: FlatBitSet,

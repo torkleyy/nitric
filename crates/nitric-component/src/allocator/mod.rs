@@ -6,12 +6,14 @@
 
 pub use self::phantom::PhantomAllocator;
 
-use crate::id::AsUsize;
-use crate::id::CheckedId;
-use crate::id::ValidId;
+use std::marker::PhantomData;
+
+use derivative::Derivative;
+
 use crate::{
     error::{InvalidIdError, OomError},
-    id::Id,
+    id::{AsUsize, CheckedId, Id, ValidId},
+    util::InstanceId,
 };
 
 mod phantom;
@@ -85,10 +87,13 @@ where
     /// Once you're done, you'll want to get the inner ID again using `CheckedId::into_inner`.
     ///
     /// This has a naive default implementation that can be replaced with a custom one if required.
-    fn create_checked(&mut self) -> Result<CheckedId<'_, ID>, OomError> {
+    fn create_checked<'merger>(
+        &mut self,
+        merger: &'merger Merger<Self>,
+    ) -> Result<CheckedId<'merger, ID>, OomError> {
         let id = self.create()?;
         let checked = id
-            .checked(&*self)
+            .checked(&*self, merger)
             .expect("The ID was just created, it cannot be invalid");
 
         Ok(checked)
@@ -142,10 +147,41 @@ where
 }
 
 /// Interface for deleting IDs flagged by `Delete::delete` without additional parameters.
-pub trait MergeDeleted<ID>: Allocator<ID>
+///
+/// # Unsafety
+///
+/// Must ensure that the `Merger` belongs to this allocator.
+pub unsafe trait MergeDeleted<ID>: Allocator<ID>
 where
     ID: Id<Allocator = Self>,
 {
     /// Deletes all IDs that were flagged for deletion by `Delete::delete`.
-    fn merge_deleted(&mut self) -> Vec<ID>;
+    fn merge_deleted(&mut self, merger: &mut Merger<Self>) -> Vec<ID>;
+}
+
+/// A type to ensure IDs cannot be deleted while they are wrapped in `CheckedId`.
+///
+/// This type should be required mutably for performing the deletion of flagged IDs.
+/// By borrowing it immutably in `CheckedId`, we ensure all checked IDs must have been dropped
+/// before a call to `MergeDeleted::merge_deleted`.
+#[derive(Derivative)]
+#[derivative(Debug(bound = ""))]
+pub struct Merger<A: ?Sized> {
+    instance_id: InstanceId,
+    _marker: PhantomData<fn(&A)>,
+}
+
+impl<A> Merger<A> {
+    /// Creates a new, unique `Merger` marker value.
+    pub fn new() -> Self {
+        Merger {
+            instance_id: InstanceId::new(),
+            _marker: PhantomData,
+        }
+    }
+
+    /// Returns a reference to the inner `InstanceId`
+    pub fn instance_id(&self) -> &InstanceId {
+        &self.instance_id
+    }
 }

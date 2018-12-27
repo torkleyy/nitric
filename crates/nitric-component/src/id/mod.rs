@@ -7,27 +7,32 @@ pub use self::checked::CheckedId;
 
 use std::{fmt::Debug, hash::Hash};
 
-use crate::{allocator::Allocator, bit_set::BitSet, error::InvalidIdError};
+use crate::{
+    allocator::{Allocator, Merger},
+    bit_set::BitSet,
+    error::InvalidIdError,
+};
 
 mod checked;
 
 /// An ID that has a unique `usize` representation as long as it is valid.
 pub trait AsUsize: Id {
-    /// Checks if this ID is valid and returns a `CheckedId` which implementes `ValidId`, or an
+    /// Checks if this ID is valid and returns a `CheckedId` which implements `ValidId`, or an
     /// error in case `self` is invalid.
     ///
     /// This is useful if
     ///
     /// * a function requires the `ValidId` trait and your ID may be invalid
     /// * you need to pass your ID to several functions
-    fn checked(
+    fn checked<'merger>(
         self,
         allocator: &Self::Allocator,
-    ) -> Result<CheckedId<'_, Self>, InvalidIdError<Self>> {
+        merger: &'merger Merger<Self::Allocator>,
+    ) -> Result<CheckedId<'merger, Self>, InvalidIdError<Self>> {
         // Unsafety: this is safe because the allocator is guaranteed to keep IDs valid for as long
         // as it is borrowed immutably. We ensure it's valid
         self.try_as_usize(allocator)
-            .map(|u| unsafe { CheckedId::new_from_fields(self, u, allocator) })
+            .map(|u| unsafe { CheckedId::new_from_fields(self, u, merger) })
     }
 
     /// Returns the `usize` representation of this ID, failing if the ID is invalid.
