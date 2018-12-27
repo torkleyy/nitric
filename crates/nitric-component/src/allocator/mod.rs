@@ -19,23 +19,13 @@ use crate::{
 mod phantom;
 
 /// Generic allocator for IDs of type `ID`.
-///
-/// # Unsafety
-///
-/// This is unsafe to implement because it is required to uphold the contract of `is_valid`.
-/// Breaking it is allowed exhibit undefined behavior.
-pub unsafe trait Allocator<ID>
+pub trait Allocator<ID>
 where
     ID: Id<Allocator = Self>,
 {
     /// Checks if `id` is a valid ID.
     ///
     /// This can return `false` for example if the ID has been deleted.
-    ///
-    /// # Contract
-    ///
-    /// This method is required to keep returning `true` for as long as the allocator is borrowed
-    /// immutably.
     ///
     /// # Panics
     ///
@@ -147,15 +137,15 @@ where
 }
 
 /// Interface for deleting IDs flagged by `Delete::delete` without additional parameters.
-///
-/// # Unsafety
-///
-/// Must ensure that the `Merger` belongs to this allocator.
-pub unsafe trait MergeDeleted<ID>: Allocator<ID>
+pub trait MergeDeleted<ID>: Allocator<ID>
 where
     ID: Id<Allocator = Self>,
 {
     /// Deletes all IDs that were flagged for deletion by `Delete::delete`.
+    ///
+    /// # Panics
+    ///
+    /// Panics if `merger` was not created by this allocator.
     fn merge_deleted(&mut self, merger: &mut Merger<Self>) -> Vec<ID>;
 }
 

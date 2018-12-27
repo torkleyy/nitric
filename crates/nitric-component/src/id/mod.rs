@@ -29,10 +29,8 @@ pub trait AsUsize: Id {
         allocator: &Self::Allocator,
         merger: &'merger Merger<Self::Allocator>,
     ) -> Result<CheckedId<'merger, Self>, InvalidIdError<Self>> {
-        // Unsafety: this is safe because the allocator is guaranteed to keep IDs valid for as long
-        // as it is borrowed immutably. We ensure it's valid
         self.try_as_usize(allocator)
-            .map(|u| unsafe { CheckedId::new_from_fields(self, u, merger) })
+            .map(|u| CheckedId::new_from_fields(self, u, merger))
     }
 
     /// Returns the `usize` representation of this ID, failing if the ID is invalid.
@@ -91,11 +89,7 @@ pub trait SparseLinear: AsUsize + Id {
 ///
 /// An ID implementing this type must be valid in terms of `Allocator::is_valid` for as long as it
 /// can be accessed.
-///
-/// # Memory safety
-///
-/// Implementing this type without meeting the contract may produce memory safety bugs.
-pub unsafe trait ValidId<O: Id>: Id {
+pub trait ValidId<O: Id>: Id {
     /// Returns the `usize` representation of this ID.
     ///
     /// This operation cannot fail and is only available for IDs that have this property ensured

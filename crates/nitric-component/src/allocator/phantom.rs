@@ -7,8 +7,7 @@ pub struct PhantomAllocator {
     never: Never,
 }
 
-// Unsafety: `is_valid` holds the contract (as it can never be called).
-unsafe impl<ID> Allocator<ID> for PhantomAllocator
+impl<ID> Allocator<ID> for PhantomAllocator
 where
     ID: Id<Allocator = Self>,
 {

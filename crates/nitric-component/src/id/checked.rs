@@ -26,16 +26,12 @@ where
     ID: Id,
 {
     /// Creates a new checked ID from an `id`, the `usize` representation and a reference to the
-    /// allocator.
+    /// merger of the `Id`'s allocator.
     ///
     /// # Contract
     ///
     /// * `id` must be valid for as long as `allocator` is borrowed
-    pub unsafe fn new_from_fields(
-        id: ID,
-        u_repr: usize,
-        _merger: &'merger Merger<ID::Allocator>,
-    ) -> Self {
+    pub fn new_from_fields(id: ID, u_repr: usize, _merger: &'merger Merger<ID::Allocator>) -> Self {
         CheckedId {
             id,
             u_repr,
@@ -69,7 +65,7 @@ where
     type Allocator = PhantomAllocator;
 }
 
-unsafe impl<'merger, ID> ValidId<ID> for CheckedId<'merger, ID>
+impl<'merger, ID> ValidId<ID> for CheckedId<'merger, ID>
 where
     ID: Id + 'merger,
 {

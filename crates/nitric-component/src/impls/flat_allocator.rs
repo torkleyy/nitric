@@ -27,7 +27,7 @@ impl FlatAllocator {
     }
 }
 
-unsafe impl Allocator<FlatUsize> for FlatAllocator {
+impl Allocator<FlatUsize> for FlatAllocator {
     fn is_valid(&self, id: &FlatUsize) -> bool {
         self.inner.is_valid(id.clone().into())
     }
@@ -55,7 +55,7 @@ impl CreateChecked<FlatUsize> for FlatAllocator {
     ) -> Result<CheckedId<'merger, FlatUsize>, OomError> {
         self.inner
             .create()
-            .map(move |id| unsafe { CheckedId::new_from_fields(id.into(), id, merger) })
+            .map(move |id| CheckedId::new_from_fields(id.into(), id, merger))
     }
 }
 
@@ -82,7 +82,7 @@ impl Delete<FlatUsize> for FlatAllocator {
     }
 }
 
-unsafe impl MergeDeleted<FlatUsize> for FlatAllocator {
+impl MergeDeleted<FlatUsize> for FlatAllocator {
     fn merge_deleted(&mut self, merger: &mut Merger<Self>) -> Vec<FlatUsize> {
         merger.instance_id().assert_eq(&self.merger);
 
