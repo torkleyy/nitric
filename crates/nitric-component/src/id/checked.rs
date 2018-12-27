@@ -16,7 +16,7 @@ use crate::{
 #[derivative(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub struct CheckedId<'merger, ID: Id> {
     /// The wrapped ID which can be extracted using this field or moved out using `into_inner`.
-    pub id: ID,
+    id: ID,
     u_repr: usize,
     _merger: PhantomData<&'merger Merger<ID::Allocator>>,
 }
@@ -41,6 +41,11 @@ where
             u_repr,
             _merger: PhantomData,
         }
+    }
+
+    /// Returns a reference to the wrapped ID.
+    pub fn id(&self) -> &ID {
+        &self.id
     }
 }
 
