@@ -10,4 +10,5 @@ mod flat_allocator;
 mod flat_bit_set;
 mod flat_id;
 mod tv_storage;
+mod type_safe_id;
 mod usize_allocator;
