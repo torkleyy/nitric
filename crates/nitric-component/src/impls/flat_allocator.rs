@@ -94,3 +94,29 @@ impl MergeDeleted<FlatUsize> for FlatAllocator {
             .collect()
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::id::{AsUsize, ValidId};
+
+    #[test]
+    fn checked() {
+        let (mut alloc, mut merger) = FlatAllocator::new();
+
+        let a = alloc.create().unwrap();
+        let b = alloc.create_checked(&merger).unwrap();
+        let c = alloc.create_checked(&merger).unwrap();
+
+        println!("{}, {}", b.as_usize(), c.as_usize());
+
+        if let Ok(a) = a.try_as_usize(&alloc) {
+            println!("a: {}", a);
+        }
+
+        alloc.merge_deleted(&mut merger);
+
+        // println!("{}, {}", b.as_usize(), c.as_usize()); <-- would fail since we cannot hold
+        //                                                     `merger` until here
+    }
+}
