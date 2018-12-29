@@ -35,6 +35,7 @@
 //!
 //! Additionally, error types can be found in `error`.
 //! Utility types can be found in `util`.
+//! A prelude for common traits & types can be imported using `use nitric_component::prelude::*`.
 //!
 
 #[macro_use]
@@ -48,4 +49,5 @@ pub mod storage;
 pub mod error;
 pub mod impls;
 
+pub mod prelude;
 pub mod util;
