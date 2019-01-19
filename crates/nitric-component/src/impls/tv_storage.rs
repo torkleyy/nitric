@@ -75,7 +75,7 @@ where
     where
         V: ValidId<Self::Id>,
     {
-        let id: usize = id.as_usize();
+        let id: usize = id.as_inner().as_usize();
         if self.mask.contains(id) {
             let data_index = self.data_indices[id];
             let data = &self.data[data_index];
@@ -96,7 +96,7 @@ where
     where
         V: ValidId<Self::Id>,
     {
-        let id: usize = id.as_usize();
+        let id: usize = id.as_inner().as_usize();
         if self.mask.contains(id) {
             let data_index = self.data_indices[id];
             let data = &mut self.data[data_index];
@@ -124,7 +124,7 @@ where
         use std::iter::repeat;
         use std::mem::replace;
 
-        let id: usize = id_orig.as_usize();
+        let id: usize = id_orig.as_inner().as_usize();
 
         if self.mask.add(id) {
             Some(replace(self.get_mut(&id_orig).unwrap(), component))
@@ -152,7 +152,7 @@ where
     where
         V: ValidId<Self::Id>,
     {
-        let id = id.as_usize();
+        let id: usize = id.as_inner().as_usize();
 
         if self.mask.remove(id) {
             let data_index = self.data_indices[id];
@@ -184,7 +184,7 @@ mod tests {
     use super::*;
     use crate::{
         allocator::{Create, CreateChecked},
-        id::AsUsize,
+        id::MergingDeletion,
         impls::{FlatAllocator, FlatUsize},
     };
 

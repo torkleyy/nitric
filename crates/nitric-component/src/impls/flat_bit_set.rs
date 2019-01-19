@@ -68,7 +68,6 @@ unsafe impl BitSet for FlatBitSet {
         let mpos = pos * Self::NUM_BITS;
 
         (0..Self::NUM_BITS)
-            .into_iter()
             .map(|bpos| self.remove(mpos + bpos))
             .position(|b| b)
             .map(|n| n + mpos)

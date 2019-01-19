@@ -1,7 +1,7 @@
 use crate::{
     allocator::{Allocator, Create, CreateChecked, Delete, MergeDeleted, Merger},
     error::{InvalidIdError, OomError},
-    id::{CheckedId, ValidId},
+    id::{CheckedId, SparseLinear, ValidId},
     impls::{FlatUsize, UsizeAllocator},
     util::Reference,
 };
@@ -61,18 +61,18 @@ impl CreateChecked<FlatUsize> for FlatAllocator {
 
 impl Delete<FlatUsize> for FlatAllocator {
     #[inline]
-    fn is_flagged<V>(&mut self, id: &V) -> bool
+    fn is_flagged<V>(&self, id: &V) -> bool
     where
         V: ValidId<FlatUsize>,
     {
-        self.inner.is_flagged(id.as_usize())
+        self.inner.is_flagged(id.as_inner().as_usize())
     }
 
     fn delete<V>(&mut self, id: &V)
     where
         V: ValidId<FlatUsize>,
     {
-        self.inner.delete_valid(id.as_usize())
+        self.inner.delete_valid(id.as_inner().as_usize())
     }
 
     fn try_delete(&mut self, id: &FlatUsize) -> Result<(), InvalidIdError<FlatUsize>> {
@@ -88,7 +88,7 @@ impl MergeDeleted<FlatUsize> for FlatAllocator {
 
         self.inner
             .merge_deleted()
-            .into_iter()
+            .iter()
             .cloned()
             .map(Into::into)
             .collect()
@@ -98,7 +98,7 @@ impl MergeDeleted<FlatUsize> for FlatAllocator {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::id::{AsUsize, ValidId};
+    use crate::prelude::*;
 
     #[test]
     fn assert_deleted() {
@@ -126,7 +126,7 @@ mod tests {
 
         println!("{}, {}", b.as_usize(), c.as_usize());
 
-        if let Ok(a) = a.try_as_usize(&alloc) {
+        if let Ok(a) = a.try_as_key(&alloc) {
             println!("a: {}", a);
         }
 

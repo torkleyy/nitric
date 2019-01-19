@@ -1,9 +1,11 @@
+use crate::id::MergingDeletion;
 use crate::{
     allocator::Allocator,
     error::InvalidIdError,
-    id::{AsUsize, Id, SparseLinear},
+    id::{Id, SparseLinear},
     impls::{FlatAllocator, FlatBitSet},
 };
+use std::borrow::Cow;
 
 /// A `usize`-based ID using the `FlatAllocator` and a `FlatBitSet`.
 ///
@@ -24,18 +26,8 @@ pub struct FlatUsize {
 
 impl FlatUsize {
     /// Returns the inner `usize`.
-    pub fn get_inner(&self) -> usize {
+    pub fn into_usize(self) -> usize {
         self.inner
-    }
-}
-
-impl AsUsize for FlatUsize {
-    fn try_as_usize(&self, allocator: &FlatAllocator) -> Result<usize, InvalidIdError<Self>> {
-        if allocator.is_valid(&self) {
-            Ok(self.inner)
-        } else {
-            Err(InvalidIdError(*self))
-        }
     }
 }
 
@@ -53,7 +45,24 @@ impl Into<usize> for FlatUsize {
 
 impl Id for FlatUsize {
     type Allocator = FlatAllocator;
+    type Key = usize;
+
+    fn try_as_key(
+        &self,
+        allocator: &Self::Allocator,
+    ) -> Result<Cow<'_, Self::Key>, InvalidIdError<Self>> {
+        match allocator.is_valid(self) {
+            true => Ok(self.as_key_unchecked()),
+            false => Err(InvalidIdError(*self)),
+        }
+    }
+
+    fn as_key_unchecked(&self) -> Cow<'_, Self::Key> {
+        Cow::Borrowed(&self.inner)
+    }
 }
+
+impl MergingDeletion for FlatUsize {}
 
 impl SparseLinear for FlatUsize {
     type BitSet = FlatBitSet;
@@ -70,11 +79,17 @@ mod tests {
 
         let id = alloc.create().unwrap();
 
-        assert_eq!(id.try_as_usize(&alloc), Ok(id.get_inner()));
+        assert_eq!(
+            id.try_as_key(&alloc).map(Cow::into_owned),
+            Ok(id.into_usize())
+        );
 
         alloc.delete(&id.checked(&alloc, &merger).unwrap());
         alloc.merge_deleted(&mut merger);
 
-        assert_eq!(id.try_as_usize(&alloc), Err(InvalidIdError(id)));
+        assert_eq!(
+            id.try_as_key(&alloc).map(Cow::into_owned),
+            Err(InvalidIdError(id))
+        );
     }
 }

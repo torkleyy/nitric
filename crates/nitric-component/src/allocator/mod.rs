@@ -12,7 +12,7 @@ use derivative::Derivative;
 
 use crate::{
     error::{InvalidIdError, OomError},
-    id::{AsUsize, CheckedId, Id, ValidId},
+    id::{CheckedId, Id, MergingDeletion, ValidId},
     util::InstanceId,
 };
 
@@ -64,10 +64,8 @@ where
 /// arguments.
 pub trait CreateChecked<ID>: Allocator<ID> + Create<ID>
 where
-    ID: AsUsize + Id<Allocator = Self>,
+    ID: Id<Allocator = Self> + MergingDeletion,
 {
-    // TODO: consider associated type so it's not exclusive to usize based IDs
-
     /// Creates a new ID of type `<Self as Allocator>::Id` and wraps it in a `CheckedId`.
     /// Also see `Create::create`.
     ///
@@ -97,7 +95,7 @@ where
     ID: Id<Allocator = Self>,
 {
     /// Returns `true` if `id` is flagged for deletion.
-    fn is_flagged<V>(&mut self, id: &V) -> bool
+    fn is_flagged<V>(&self, id: &V) -> bool
     where
         V: ValidId<ID>;
 
@@ -139,7 +137,7 @@ where
 /// Interface for deleting IDs flagged by `Delete::delete` without additional parameters.
 pub trait MergeDeleted<ID>: Allocator<ID>
 where
-    ID: Id<Allocator = Self>,
+    ID: Id<Allocator = Self> + MergingDeletion,
 {
     /// Deletes all IDs that were flagged for deletion by `Delete::delete`.
     ///
@@ -155,7 +153,7 @@ where
 /// By borrowing it immutably in `CheckedId`, we ensure all checked IDs must have been dropped
 /// before a call to `MergeDeleted::merge_deleted`.
 #[derive(Derivative)]
-#[derivative(Debug(bound = ""))]
+#[derivative(Debug(bound = ""), Default(bound = ""))]
 pub struct Merger<A: ?Sized> {
     instance_id: InstanceId,
     _marker: PhantomData<fn(&A)>,
@@ -164,10 +162,7 @@ pub struct Merger<A: ?Sized> {
 impl<A> Merger<A> {
     /// Creates a new, unique `Merger` marker value.
     pub fn new() -> Self {
-        Merger {
-            instance_id: InstanceId::new(),
-            _marker: PhantomData,
-        }
+        Default::default()
     }
 
     /// Returns a reference to the inner `InstanceId`
