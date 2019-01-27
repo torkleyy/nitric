@@ -151,5 +151,5 @@ both licenses.
 
 Every contribution made to this project is assumed to be licensed according to these terms.
 
-See [LICENSE](LICENSE), [docs/LICENSE-MIT](docs/LICENSE-MIT) and [docs/LICENSE-APACHE] for more
+See [LICENSE](LICENSE), [docs/LICENSE-MIT](docs/LICENSE-MIT) and [docs/LICENSE-APACHE](docs/LICENSE-APACHE) for more
 information.
