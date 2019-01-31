@@ -1,0 +1,10 @@
+[package]
+name = "nitric-world"
+version = "0.1.0"
+authors = ["Jacob Kiesel <kieseljake@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+derive-new = "0.5.6"
+hashbrown = "0.1"
+mopa = "0.2.2"
