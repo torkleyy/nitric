@@ -1,9 +1,15 @@
+#![warn(missing_docs)]
+
+//! Provides a `World` type which allows you to index resources with their type, and an arbitrary
+//! key type.
+
 use std::{any::TypeId, borrow::Borrow, hash::Hash};
 
 use derive_new::new;
 use hashbrown::HashMap;
 use mopa::{mopafy, Any};
 
+/// A collection of resources that can be accessed via their Type and an arbitrary key type `K`.
 #[derive(Default, new)]
 pub struct World<K>
 where
@@ -14,6 +20,7 @@ where
 }
 
 impl<K: Hash + Eq> World<K> {
+    /// Adds a resource to the world
     pub fn insert<T: Resource>(&mut self, k: K, v: T) -> Option<T> {
         self.resources
             .entry(TypeId::of::<T>())
@@ -22,6 +29,7 @@ impl<K: Hash + Eq> World<K> {
             .map(|b| *b.downcast().ok().expect("Unreachable"))
     }
 
+    /// Retrieves an immutable reference to a resource from the world.
     pub fn get<T: Resource, Q: ?Sized>(&self, k: &Q) -> Option<&T>
     where
         K: Borrow<Q>,
@@ -32,6 +40,7 @@ impl<K: Hash + Eq> World<K> {
             .and_then(|m| m.get(k).and_then(|b| b.downcast_ref()))
     }
 
+    /// Retrieves a mutable reference to a resource from the world.
     pub fn get_mut<T: Resource, Q: ?Sized>(&mut self, k: &Q) -> Option<&mut T>
     where
         K: Borrow<Q>,
@@ -42,6 +51,7 @@ impl<K: Hash + Eq> World<K> {
             .and_then(|m| m.get_mut(k).and_then(|b| b.downcast_mut()))
     }
 
+    /// Removes a resource from the world.
     pub fn remove<T: Resource, Q: ?Sized>(&mut self, k: &Q) -> Option<T>
     where
         K: Borrow<Q>,
@@ -62,6 +72,7 @@ impl<K: Hash + Eq> World<K> {
     }
 }
 
+/// A bundle trait automatically implemented for any type that is `Any + Send + Sync`.
 pub trait Resource: Any + Send + Sync + 'static {}
 
 mopafy!(Resource);
