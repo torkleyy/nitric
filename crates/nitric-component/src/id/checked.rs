@@ -4,9 +4,9 @@ use derivative::Derivative;
 
 use crate::id::WrapperId;
 use crate::{
-    allocator::{Merger, PhantomAllocator},
+    allocator::PhantomAllocator,
     error::InvalidIdError,
-    id::{Id, ValidId},
+    id::{Id, MergingDeletion, ValidId},
 };
 
 /// Represents an ID that is guaranteed to be valid.
@@ -22,16 +22,16 @@ use crate::{
     Hash,
     PartialEq
 )]
-pub struct CheckedId<'merger, ID: Id> {
+pub struct CheckedId<'merger, ID: Id + MergingDeletion> {
     /// The wrapped ID which can be extracted using this field or moved out using `into_inner`.
     id: ID,
     key: ID::Key,
-    _merger: PhantomData<&'merger Merger<ID::Allocator>>,
+    _merger: PhantomData<&'merger ID::Merger>,
 }
 
 impl<'merger, ID> CheckedId<'merger, ID>
 where
-    ID: Id,
+    ID: Id + MergingDeletion,
 {
     /// Creates a new checked ID from an `id`, the `usize` representation and a reference to the
     /// merger of the `Id`'s allocator.
@@ -39,7 +39,7 @@ where
     /// # Contract
     ///
     /// * `id` must be valid for as long as `allocator` is borrowed
-    pub fn new_from_fields(id: ID, key: ID::Key, _merger: &'merger Merger<ID::Allocator>) -> Self {
+    pub fn new_from_fields(id: ID, key: ID::Key, _merger: &'merger ID::Merger) -> Self {
         CheckedId {
             id,
             key,
@@ -55,7 +55,7 @@ where
 
 impl<'merger, ID> Id for CheckedId<'merger, ID>
 where
-    ID: Id + 'merger,
+    ID: Id + MergingDeletion + 'merger,
 {
     type Allocator = PhantomAllocator;
     type Key = ID::Key;
@@ -74,7 +74,7 @@ where
 
 impl<'merger, ID> ValidId<ID> for CheckedId<'merger, ID>
 where
-    ID: Id + 'merger,
+    ID: Id + MergingDeletion + 'merger,
 {
     fn as_inner(&self) -> &ID {
         &self.id
@@ -91,7 +91,7 @@ where
 
 impl<'merger, ID> WrapperId for CheckedId<'merger, ID>
 where
-    ID: Id + 'merger,
+    ID: MergingDeletion + Id + 'merger,
 {
     type Original = ID;
 

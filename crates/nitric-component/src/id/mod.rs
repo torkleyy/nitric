@@ -8,7 +8,7 @@ pub use self::checked::CheckedId;
 use std::{borrow::Cow, fmt::Debug, hash::Hash};
 
 use crate::{
-    allocator::{Allocator, Merger},
+    allocator::{Allocator},
     bit_set::BitSet,
     error::InvalidIdError,
 };
@@ -44,8 +44,12 @@ pub trait Id: Clone + Debug + Sized {
     fn as_key_unchecked(&self) -> Cow<Self::Key>;
 }
 
-/// An ID that will only turn invalid when
+/// An ID that will only turn invalid when merged.
 pub trait MergingDeletion: Id {
+    /// The merger for this ID. You should make sure that the merger cannot be duplicated.
+    /// It's usually a good idea to use `nitric_component::allocator::Merger` for this.
+    type Merger;
+
     /// Checks if this ID is valid and returns a `CheckedId` which implements `ValidId`, or an
     /// error in case `self` is invalid.
     ///
@@ -56,7 +60,7 @@ pub trait MergingDeletion: Id {
     fn checked<'merger>(
         self,
         allocator: &Self::Allocator,
-        merger: &'merger Merger<Self::Allocator>,
+        merger: &'merger Self::Merger,
     ) -> Result<CheckedId<'merger, Self>, InvalidIdError<Self>> {
         self.try_as_key(allocator)
             .map(|u| u.into_owned())
@@ -146,6 +150,7 @@ where
     T: WrapperId,
     T::Original: Id<Key = T::Key> + MergingDeletion,
 {
+    type Merger = <T::Original as MergingDeletion>::Merger;
 }
 
 impl<T> SparseLinear for T

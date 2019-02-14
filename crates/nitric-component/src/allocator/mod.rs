@@ -77,7 +77,7 @@ where
     /// This has a naive default implementation that can be replaced with a custom one if required.
     fn create_checked<'merger>(
         &mut self,
-        merger: &'merger Merger<Self>,
+        merger: &'merger ID::Merger,
     ) -> Result<CheckedId<'merger, ID>, OomError> {
         let id = self.create()?;
         let checked = id
@@ -95,8 +95,12 @@ where
     ID: Id<Allocator = Self>,
 {
     /// Returns `true` if `id` is flagged for deletion.
+    ///
+    /// Only available if `ID` implements `MergingDeletion`; if it doesn't, use
+    /// `Allocator::is_valid` instead.
     fn is_flagged<V>(&self, id: &V) -> bool
     where
+        ID: MergingDeletion,
         V: ValidId<ID>;
 
     /// Flags a previously created ID that is guaranteed to be valid for deletion.
@@ -134,7 +138,8 @@ where
     }
 }
 
-/// Interface for deleting IDs flagged by `Delete::delete` without additional parameters.
+/// Interface for deleting IDs flagged by `Delete::delete` without only a mutable reference to
+/// the `Merger`.
 pub trait MergeDeleted<ID>: Allocator<ID>
 where
     ID: Id<Allocator = Self> + MergingDeletion,
@@ -144,10 +149,12 @@ where
     /// # Panics
     ///
     /// Panics if `merger` was not created by this allocator.
-    fn merge_deleted(&mut self, merger: &mut Merger<Self>) -> Vec<ID>;
+    fn merge_deleted(&mut self, merger: &mut ID::Merger) -> Vec<ID>;
 }
 
 /// A type to ensure IDs cannot be deleted while they are wrapped in `CheckedId`.
+///
+/// This is almost always the right choice for `MergingDeletion::Merger`.
 ///
 /// This type should be required mutably for performing the deletion of flagged IDs.
 /// By borrowing it immutably in `CheckedId`, we ensure all checked IDs must have been dropped

@@ -1,6 +1,6 @@
 use crate::id::MergingDeletion;
 use crate::{
-    allocator::Allocator,
+    allocator::{Allocator, Merger},
     error::InvalidIdError,
     id::{Id, SparseLinear},
     impls::{FlatAllocator, FlatBitSet},
@@ -62,7 +62,9 @@ impl Id for FlatUsize {
     }
 }
 
-impl MergingDeletion for FlatUsize {}
+impl MergingDeletion for FlatUsize {
+    type Merger = Merger<Self::Allocator>;
+}
 
 impl SparseLinear for FlatUsize {
     type BitSet = FlatBitSet;
