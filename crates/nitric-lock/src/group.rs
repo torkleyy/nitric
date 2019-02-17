@@ -1,5 +1,4 @@
-use crate::mutex::new_mutex;
-use crate::Mutex;
+use crate::{mutex::new_mutex, Mutex};
 
 #[derive(Default)]
 pub struct LockGroup {

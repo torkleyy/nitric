@@ -4,7 +4,8 @@ use crate::{
     impls::FlatBitSet,
 };
 
-/// A simple, non-atomic allocator that tries to return a free `usize`, bumps the counter otherwise.
+/// A simple, non-atomic allocator that tries to return a free `usize`, bumps
+/// the counter otherwise.
 #[derive(Debug, Default)]
 pub struct UsizeAllocator {
     /// Valid IDs

@@ -1,7 +1,7 @@
 #![warn(missing_docs)]
 
-//! Provides a `World` type which allows you to index resources with their type, and an arbitrary
-//! key type.
+//! Provides a `World` type which allows you to index resources with their type,
+//! and an arbitrary key type.
 
 use std::{any::TypeId, borrow::Borrow, hash::Hash};
 
@@ -9,7 +9,8 @@ use derive_new::new;
 use hashbrown::HashMap;
 use mopa::{mopafy, Any};
 
-/// A collection of resources that can be accessed via their Type and an arbitrary key type `K`.
+/// A collection of resources that can be accessed via their Type and an
+/// arbitrary key type `K`.
 #[derive(Default, new)]
 pub struct World<K>
 where
@@ -72,7 +73,8 @@ impl<K: Hash + Eq> World<K> {
     }
 }
 
-/// A bundle trait automatically implemented for any type that is `Any + Send + Sync`.
+/// A bundle trait automatically implemented for any type that is `Any + Send +
+/// Sync`.
 pub trait Resource: Any + Send + Sync + 'static {}
 
 mopafy!(Resource);

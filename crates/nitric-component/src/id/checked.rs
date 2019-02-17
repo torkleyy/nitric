@@ -2,17 +2,17 @@ use std::{borrow::Cow, marker::PhantomData};
 
 use derivative::Derivative;
 
-use crate::id::WrapperId;
 use crate::{
     allocator::PhantomAllocator,
     error::InvalidIdError,
-    id::{Id, MergingDeletion, ValidId},
+    id::{Id, MergingDeletion, ValidId, WrapperId},
 };
 
 /// Represents an ID that is guaranteed to be valid.
 ///
-/// Implements `ValidId` to allow calling methods that expect `ValidId`s, and can thus skip validity
-/// checks. This means we can ensure at type-level that a function cannot fail.
+/// Implements `ValidId` to allow calling methods that expect `ValidId`s, and
+/// can thus skip validity checks. This means we can ensure at type-level that a
+/// function cannot fail.
 #[derive(Derivative)]
 #[derivative(
     Clone,
@@ -23,7 +23,8 @@ use crate::{
     PartialEq
 )]
 pub struct CheckedId<'merger, ID: Id + MergingDeletion> {
-    /// The wrapped ID which can be extracted using this field or moved out using `into_inner`.
+    /// The wrapped ID which can be extracted using this field or moved out
+    /// using `into_inner`.
     id: ID,
     key: ID::Key,
     _merger: PhantomData<&'merger ID::Merger>,
@@ -33,8 +34,8 @@ impl<'merger, ID> CheckedId<'merger, ID>
 where
     ID: Id + MergingDeletion,
 {
-    /// Creates a new checked ID from an `id`, the `usize` representation and a reference to the
-    /// merger of the `Id`'s allocator.
+    /// Creates a new checked ID from an `id`, the `usize` representation and a
+    /// reference to the merger of the `Id`'s allocator.
     ///
     /// # Contract
     ///

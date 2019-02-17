@@ -1,8 +1,7 @@
-use crate::id::MergingDeletion;
 use crate::{
     allocator::{Allocator, Merger},
     error::InvalidIdError,
-    id::{Id, SparseLinear},
+    id::{Id, MergingDeletion, SparseLinear},
     impls::{FlatAllocator, FlatBitSet},
 };
 use std::borrow::Cow;
@@ -16,8 +15,6 @@ use std::borrow::Cow;
 ///
 /// #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 /// pub struct ClientId(pub FlatUsize);
-///
-///
 /// ```
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 pub struct FlatUsize {

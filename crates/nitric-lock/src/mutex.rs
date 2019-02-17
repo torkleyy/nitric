@@ -1,4 +1,8 @@
-use std::{cell::UnsafeCell, marker::PhantomData, ops::Deref, ops::DerefMut};
+use std::{
+    cell::UnsafeCell,
+    marker::PhantomData,
+    ops::{Deref, DerefMut},
+};
 
 use lock_api::RawMutex as Unused0;
 use parking_lot::RawMutex;

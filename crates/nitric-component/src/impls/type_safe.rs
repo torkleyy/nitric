@@ -1,18 +1,18 @@
-use std::borrow::Cow;
-use std::fmt::Debug;
-use std::marker::PhantomData;
+use std::{borrow::Cow, fmt::Debug, marker::PhantomData};
 
 use derivative::Derivative;
 
-use crate::allocator::Allocator;
-use crate::error::InvalidIdError;
-use crate::id::{Id, WrapperId};
+use crate::{
+    allocator::Allocator,
+    error::InvalidIdError,
+    id::{Id, WrapperId},
+};
 
-/// A wrapper around `ID::Allocator` to allow for multiple, opaque ID types with the same
-/// backing ID.
+/// A wrapper around `ID::Allocator` to allow for multiple, opaque ID types with
+/// the same backing ID.
 ///
-/// The type `T` is just a dummy type to actually allow for unique IDs; it should ideally
-/// just be a non-instantiable enum.
+/// The type `T` is just a dummy type to actually allow for unique IDs; it
+/// should ideally just be a non-instantiable enum.
 pub struct TypeSafeAllocator<ID: Id, T>
 where
     ID::Allocator: Sized,

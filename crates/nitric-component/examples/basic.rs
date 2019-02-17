@@ -1,7 +1,9 @@
-use nitric_component::error::OomError;
-use nitric_component::id::CheckedId;
-use nitric_component::impls::{FlatAllocator, FlatUsize, TvStorage};
-use nitric_component::prelude::*;
+use nitric_component::{
+    error::OomError,
+    id::CheckedId,
+    impls::{FlatAllocator, FlatUsize},
+    prelude::*,
+};
 
 #[derive(Debug)]
 pub struct Position {
@@ -9,8 +11,8 @@ pub struct Position {
     y: i32,
 }
 
-fn create_positions() -> TvStorage<FlatUsize, Position> {
-    TvStorage::new()
+fn create_positions() -> Storage<FlatUsize, Position> {
+    Storage::new()
 }
 
 #[derive(Debug)]
@@ -19,8 +21,8 @@ pub struct Rotation {
     angle: f32,
 }
 
-fn create_rotations() -> TvStorage<FlatUsize, Rotation> {
-    TvStorage::new()
+fn create_rotations() -> Storage<FlatUsize, Rotation> {
+    Storage::new()
 }
 
 fn create_id_set<'merger>(

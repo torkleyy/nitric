@@ -132,8 +132,9 @@ mod tests {
 
         alloc.merge_deleted(&mut merger);
 
-        // println!("{}, {}", b.as_usize(), c.as_usize()); <-- would fail since we cannot hold
-        //                                                     `merger` until here
+        // println!("{}, {}", b.as_usize(), c.as_usize()); <-- would fail since we
+        // cannot hold
+        // `merger` until here
     }
 
     #[test]

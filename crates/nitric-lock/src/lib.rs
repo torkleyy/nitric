@@ -1,12 +1,13 @@
 #![deny(unused_must_use)]
 
 //! # `nitric-lock`
-//!
 
-pub use self::group::{LockGroup, LockToken};
-pub use self::join::lock2;
-pub use self::lock::{Lock, LockInfo, Mut, RawLockGuard, ReadLock, Ref, WriteLock};
-pub use self::mutex::{Mutex, MutexGuard};
+pub use self::{
+    group::{LockGroup, LockToken},
+    join::lock2,
+    lock::{Lock, LockInfo, Mut, RawLockGuard, ReadLock, Ref, WriteLock},
+    mutex::{Mutex, MutexGuard},
+};
 
 mod group;
 mod join;
