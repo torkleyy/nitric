@@ -1,4 +1,4 @@
-# `nitric`
+# `nitric`(ABANDONED)
 
 [![Build Status](https://img.shields.io/travis-ci/torkleyy/nitric.svg?style=flat-square)](https://travis-ci.org/torkleyy/nitric)
 [![Code coverage](https://img.shields.io/codecov/c/gitlab/nitric/nitric/master.svg?style=flat-square)](https://codecov.io/gl/nitric/nitric/branch/master)
